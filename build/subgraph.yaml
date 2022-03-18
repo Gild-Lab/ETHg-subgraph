@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: NativeGild
@@ -25,7 +25,7 @@ dataSources:
         - Ungild
       abis:
         - name: NativeGild
-          file: ./abis/NativeGild.json
+          file: NativeGild\abis\NativeGild.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
@@ -45,7 +45,7 @@ dataSources:
           handler: handleURI
         - event: Ungild(address,uint256,uint256)
           handler: handleUngild
-      file: ./src/mapping.ts
+      file: NativeGild\NativeGild.wasm
   - kind: ethereum
     name: ChainlinkTwoFeedPriceOracle
     network: rinkeby
@@ -61,11 +61,11 @@ dataSources:
         - ReferencePrice
       abis:
         - name: ChainlinkTwoFeedPriceOracle
-          file: ./abis/ChainlinkTwoFeedPriceOracle.json
+          file: ChainlinkTwoFeedPriceOracle\abis\ChainlinkTwoFeedPriceOracle.json
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
-      file: ./src/chainlinkTwoFeedPriceOracle.ts
+      file: ChainlinkTwoFeedPriceOracle\ChainlinkTwoFeedPriceOracle.wasm
   - kind: ethereum
     name: ChainlinkFeedPriceOracle
     network: rinkeby
@@ -81,9 +81,8 @@ dataSources:
         - GoldPrice
       abis:
         - name: ChainlinkFeedPriceOracle
-          file: ./abis/ChainlinkFeedPriceOracle.json
+          file: ChainlinkFeedPriceOracle\abis\ChainlinkFeedPriceOracle.json
       eventHandlers:
         - event: Construction(address,address)
           handler: handleConstruction
-      file: ./src/chainlinkFeedPriceOracle.ts
-
+      file: ChainlinkFeedPriceOracle\ChainlinkFeedPriceOracle.wasm
