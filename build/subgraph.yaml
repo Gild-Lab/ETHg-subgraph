@@ -6,7 +6,7 @@ dataSources:
     name: NativeGild
     network: rinkeby
     source:
-      address: "0xc0288e5dCDDcA93774F596AA05eb670F099A6895"
+      address: "0x3BD3580ffB5Ed01a64C02d1c47a9Ba92C2E5a3Ac"
       abi: NativeGild
       startBlock: 10309465
     mapping:
@@ -50,7 +50,7 @@ dataSources:
     name: ChainlinkTwoFeedPriceOracle
     network: rinkeby
     source:
-      address: "0xBe40864C4B091A1f81bd29F82D20730FcC1fFbF3"
+      address: "0x88434e9Ff1ed1843043A6fF7986De731d8dcAc9d"
       abi: ChainlinkTwoFeedPriceOracle
       startBlock: 10309464
     mapping:
@@ -70,7 +70,7 @@ dataSources:
     name: ChainlinkFeedPriceOracle
     network: rinkeby
     source:
-      address: "0x21F8E41B546C06f39e88f959B379dBCC79582317"
+      address: "0xF89ff509F9DfF620C196c80AFFFa5D800446F181"
       abi: ChainlinkFeedPriceOracle
       startBlock: 10333021
     mapping:

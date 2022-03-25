@@ -10,7 +10,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nativegild"
   },
   "dependencies": {
+    "@amxx/graphprotocol-utils": "^1.1.0-alpha.2",
     "@graphprotocol/graph-cli": "0.26.0",
-    "@graphprotocol/graph-ts": "0.24.1"
+    "@graphprotocol/graph-ts": "^0.24.1"
   }
 }
