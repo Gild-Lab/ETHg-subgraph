@@ -1587,6 +1587,7 @@ export class ReferencePrice extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("value", Value.fromBigInt(BigInt.zero()));
+    this.set("blockValue", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -1622,5 +1623,14 @@ export class ReferencePrice extends Entity {
 
   set value(value: BigInt) {
     this.set("value", Value.fromBigInt(value));
+  }
+
+  get blockValue(): BigInt {
+    let value = this.get("blockValue");
+    return value!.toBigInt();
+  }
+
+  set blockValue(value: BigInt) {
+    this.set("blockValue", Value.fromBigInt(value));
   }
 }
