@@ -1587,6 +1587,7 @@ export class ReferencePrice extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("value", Value.fromBigInt(BigInt.zero()));
+    this.set("blockValue", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -1622,5 +1623,98 @@ export class ReferencePrice extends Entity {
 
   set value(value: BigInt) {
     this.set("value", Value.fromBigInt(value));
+  }
+
+  get blockValue(): BigInt {
+    let value = this.get("blockValue");
+    return value!.toBigInt();
+  }
+
+  set blockValue(value: BigInt) {
+    this.set("blockValue", Value.fromBigInt(value));
+  }
+}
+
+export class Block extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Block entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Block entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Block", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Block | null {
+    return changetype<Block | null>(store.get("Block", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get hash(): Bytes | null {
+    let value = this.get("hash");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set hash(value: Bytes | null) {
+    if (!value) {
+      this.unset("hash");
+    } else {
+      this.set("hash", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get parentHash(): Bytes | null {
+    let value = this.get("parentHash");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set parentHash(value: Bytes | null) {
+    if (!value) {
+      this.unset("parentHash");
+    } else {
+      this.set("parentHash", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get priceValue(): BigInt | null {
+    let value = this.get("priceValue");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set priceValue(value: BigInt | null) {
+    if (!value) {
+      this.unset("priceValue");
+    } else {
+      this.set("priceValue", Value.fromBigInt(<BigInt>value));
+    }
   }
 }

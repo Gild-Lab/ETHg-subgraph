@@ -160,3 +160,10 @@ type ReferencePrice @entity{
   value: BigInt!
   blockValue: BigInt!
 }
+
+type Block @entity {
+  id: ID!
+  hash: Bytes
+  parentHash: Bytes
+  priceValue: BigInt
+}

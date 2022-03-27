@@ -1,11 +1,10 @@
 import {ChainlinkTwoFeedPriceOracle, Construction } from "../generated/ChainlinkTwoFeedPriceOracle/ChainlinkTwoFeedPriceOracle"
-import { ReferencePrice } from "../generated/schema"
-import { ethereum } from '@graphprotocol/graph-ts'
+import { Block, ReferencePrice } from "../generated/schema"
+import { ethereum, dataSource} from '@graphprotocol/graph-ts'
 
 
 export function handleConstruction(event: Construction): void {
     let contract = ChainlinkTwoFeedPriceOracle.bind(event.address)
-    contract.price()
 
     let entity = ReferencePrice.load(event.transaction.hash.toHex())
     if (!entity) {
@@ -15,8 +14,14 @@ export function handleConstruction(event: Construction): void {
     entity.save()
 }
 
-// export function handleBlock(block: ethereum.Block): void {
-//   let id = block.hash.toHex()
-//   let entity = new ReferencePrice(id)
-//   entity.save()
-// }
+export function handleBlock(block: ethereum.Block): void {
+  let id = block.hash.toHex()
+
+  let contract = ChainlinkTwoFeedPriceOracle.bind(dataSource.address())
+
+  let blockEntity = new Block(id)
+  blockEntity.hash = block.hash;
+  blockEntity.parentHash = block.parentHash;
+  blockEntity.priceValue = contract.price()
+  blockEntity.save()
+}
