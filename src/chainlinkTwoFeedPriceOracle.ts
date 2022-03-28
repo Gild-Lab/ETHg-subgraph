@@ -23,5 +23,6 @@ export function handleBlock(block: ethereum.Block): void {
   blockEntity.hash = block.hash;
   blockEntity.parentHash = block.parentHash;
   blockEntity.priceValue = contract.price()
+  blockEntity.number = block.number;
   blockEntity.save()
 }

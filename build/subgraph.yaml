@@ -6,9 +6,9 @@ dataSources:
     name: NativeGild
     network: rinkeby
     source:
-      address: "0x3BD3580ffB5Ed01a64C02d1c47a9Ba92C2E5a3Ac"
+      address: "0x0Ebe2A534Aa2B98726532e8c62a0fCd8125F5a3C"
       abi: NativeGild
-      startBlock: 10370704
+      startBlock: 10399572
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -50,15 +50,16 @@ dataSources:
     name: ChainlinkTwoFeedPriceOracle
     network: rinkeby
     source:
-      address: "0x88434e9Ff1ed1843043A6fF7986De731d8dcAc9d"
+      address: "0xee939E39F731eDD4eA9CC6F0126c03A618bF0930"
       abi: ChainlinkTwoFeedPriceOracle
-      startBlock: 10370701
+      startBlock: 10399568
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - ReferencePrice
+        - Block
       abis:
         - name: ChainlinkTwoFeedPriceOracle
           file: ChainlinkTwoFeedPriceOracle\abis\ChainlinkTwoFeedPriceOracle.json
@@ -72,9 +73,9 @@ dataSources:
     name: ChainlinkFeedPriceOracle
     network: rinkeby
     source:
-      address: "0xF89ff509F9DfF620C196c80AFFFa5D800446F181"
+      address: "0x517602b3219E9644D61bc83318a59B5b094Fc335"
       abi: ChainlinkFeedPriceOracle
-      startBlock: 10370703
+      startBlock: 10399570
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

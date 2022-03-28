@@ -1633,7 +1633,6 @@ export class ReferencePrice extends Entity {
   set blockValue(value: BigInt) {
     this.set("blockValue", Value.fromBigInt(value));
   }
-<<<<<<< HEAD
 }
 
 export class Block extends Entity {
@@ -1718,6 +1717,21 @@ export class Block extends Entity {
       this.set("priceValue", Value.fromBigInt(<BigInt>value));
     }
   }
-=======
->>>>>>> 4b6534b6e82748539f2f1fc1848d6510c9640296
+
+  get number(): BigInt | null {
+    let value = this.get("number");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set number(value: BigInt | null) {
+    if (!value) {
+      this.unset("number");
+    } else {
+      this.set("number", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }

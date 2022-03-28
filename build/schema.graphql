@@ -166,4 +166,5 @@ type Block @entity {
   hash: Bytes
   parentHash: Bytes
   priceValue: BigInt
+  number: BigInt
 }
