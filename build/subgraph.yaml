@@ -69,23 +69,3 @@ dataSources:
       blockHandlers:
         - handler: handleBlock
       file: ChainlinkTwoFeedPriceOracle\ChainlinkTwoFeedPriceOracle.wasm
-  - kind: ethereum
-    name: ChainlinkFeedPriceOracle
-    network: rinkeby
-    source:
-      address: "0x517602b3219E9644D61bc83318a59B5b094Fc335"
-      abi: ChainlinkFeedPriceOracle
-      startBlock: 10399570
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - GoldPrice
-      abis:
-        - name: ChainlinkFeedPriceOracle
-          file: ChainlinkFeedPriceOracle\abis\ChainlinkFeedPriceOracle.json
-      eventHandlers:
-        - event: Construction(address,address)
-          handler: handleConstruction
-      file: ChainlinkFeedPriceOracle\ChainlinkFeedPriceOracle.wasm
