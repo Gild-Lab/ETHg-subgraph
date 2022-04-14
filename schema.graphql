@@ -150,11 +150,6 @@ type Construction @entity{
   priceOracle: Bytes
 }
 
-type GoldPrice @entity{
-  id: ID!
-  value: BigInt!
-}
-
 type ReferencePrice @entity{
   id: ID!
   value: BigInt!
