@@ -6,9 +6,9 @@ dataSources:
     name: NativeGild
     network: matic
     source:
-      address: "0x885BC2b248aAf42FCfc8b6166Cb4A5e9ca85D219"
+      address: "0xF6156980A07346cA023896B281320c122347E7e5"
       abi: NativeGild
-      startBlock: 27355835
+      startBlock: 27445539
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
