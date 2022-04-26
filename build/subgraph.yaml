@@ -6,9 +6,9 @@ dataSources:
     name: NativeGild
     network: matic
     source:
-      address: "0x885BC2b248aAf42FCfc8b6166Cb4A5e9ca85D219"
       abi: NativeGild
-      startBlock: 27355835
+      address: "0xF6156980A07346cA023896B281320c122347E7e5"
+      startBlock: 27445539
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -25,7 +25,7 @@ dataSources:
         - Ungild
       abis:
         - name: NativeGild
-          file: NativeGild/abis/NativeGild.json
+          file: NativeGild\abis\NativeGild.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
@@ -45,13 +45,13 @@ dataSources:
           handler: handleURI
         - event: Ungild(address,uint256,uint256)
           handler: handleUngild
-      file: NativeGild/NativeGild.wasm
+      file: NativeGild\NativeGild.wasm
   - kind: ethereum
     name: ChainlinkTwoFeedPriceOracle
     network: matic
     source:
-      address: "0x9b64bF291c526B01D82545DF544feAEdE410dC86"
       abi: ChainlinkTwoFeedPriceOracle
+      address: "0x9b64bF291c526B01D82545DF544feAEdE410dC86"
       startBlock: 27355829
     mapping:
       kind: ethereum/events
@@ -62,10 +62,10 @@ dataSources:
         - Block
       abis:
         - name: ChainlinkTwoFeedPriceOracle
-          file: ChainlinkTwoFeedPriceOracle/abis/ChainlinkTwoFeedPriceOracle.json
+          file: ChainlinkTwoFeedPriceOracle\abis\ChainlinkTwoFeedPriceOracle.json
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
       blockHandlers:
         - handler: handleBlock
-      file: ChainlinkTwoFeedPriceOracle/ChainlinkTwoFeedPriceOracle.wasm
+      file: ChainlinkTwoFeedPriceOracle\ChainlinkTwoFeedPriceOracle.wasm

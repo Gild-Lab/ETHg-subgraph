@@ -1,0 +1,22 @@
+{
+    "matic": { 
+        "NativeGild": { 
+            "address": "0xF6156980A07346cA023896B281320c122347E7e5", 
+            "startBlock": 27445539 
+        },
+        "ChainlinkTwoFeedPriceOracle": {
+            "address": "0x9b64bF291c526B01D82545DF544feAEdE410dC86",
+            "startBlock": 27355829
+        }
+    },
+    "rinkeby": {
+        "NativeGild": {
+            "address": "0x0ebe2a534aa2b98726532e8c62a0fcd8125f5a3c",
+            "startBlock": 10399572
+        },
+        "ChainlinkTwoFeedPriceOracle": {
+            "address": "0xee939E39F731eDD4eA9CC6F0126c03A618bF0930",
+            "startBlock": 10399568
+        }
+    }
+}
