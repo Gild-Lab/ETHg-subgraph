@@ -1263,31 +1263,32 @@ export class Transaction extends Entity {
   }
 }
 
-export class Gild extends Entity {
+export class Deposit extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("sender", Value.fromBytes(Bytes.empty()));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
-    this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("owner", Value.fromBytes(Bytes.empty()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
+    this.set("caller", Value.fromBytes(Bytes.empty()));
+    this.set("assets", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Gild entity without an ID");
+    assert(id != null, "Cannot save Deposit entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Gild entity with non-string ID. " +
+        "Cannot save Deposit entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Gild", id.toString(), this);
+      store.set("Deposit", id.toString(), this);
     }
   }
 
-  static load(id: string): Gild | null {
-    return changetype<Gild | null>(store.get("Gild", id));
+  static load(id: string): Deposit | null {
+    return changetype<Deposit | null>(store.get("Deposit", id));
   }
 
   get id(): string {
@@ -1299,59 +1300,70 @@ export class Gild extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get sender(): Bytes {
-    let value = this.get("sender");
+  get owner(): Bytes {
+    let value = this.get("owner");
     return value!.toBytes();
   }
 
-  set sender(value: Bytes) {
-    this.set("sender", Value.fromBytes(value));
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
   }
 
-  get price(): BigInt {
-    let value = this.get("price");
+  get shares(): BigInt {
+    let value = this.get("shares");
     return value!.toBigInt();
   }
 
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
   }
 
-  get amount(): BigInt {
-    let value = this.get("amount");
+  get caller(): Bytes {
+    let value = this.get("caller");
+    return value!.toBytes();
+  }
+
+  set caller(value: Bytes) {
+    this.set("caller", Value.fromBytes(value));
+  }
+
+  get assets(): BigInt {
+    let value = this.get("assets");
     return value!.toBigInt();
   }
 
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
+  set assets(value: BigInt) {
+    this.set("assets", Value.fromBigInt(value));
   }
 }
 
-export class Ungild extends Entity {
+export class Withdraw extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("sender", Value.fromBytes(Bytes.empty()));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
-    this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("assets", Value.fromBigInt(BigInt.zero()));
+    this.set("caller", Value.fromBytes(Bytes.empty()));
+    this.set("owner", Value.fromBytes(Bytes.empty()));
+    this.set("receiver", Value.fromBytes(Bytes.empty()));
+    this.set("shares", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Ungild entity without an ID");
+    assert(id != null, "Cannot save Withdraw entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Ungild entity with non-string ID. " +
+        "Cannot save Withdraw entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Ungild", id.toString(), this);
+      store.set("Withdraw", id.toString(), this);
     }
   }
 
-  static load(id: string): Ungild | null {
-    return changetype<Ungild | null>(store.get("Ungild", id));
+  static load(id: string): Withdraw | null {
+    return changetype<Withdraw | null>(store.get("Withdraw", id));
   }
 
   get id(): string {
@@ -1363,31 +1375,49 @@ export class Ungild extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get sender(): Bytes {
-    let value = this.get("sender");
+  get assets(): BigInt {
+    let value = this.get("assets");
+    return value!.toBigInt();
+  }
+
+  set assets(value: BigInt) {
+    this.set("assets", Value.fromBigInt(value));
+  }
+
+  get caller(): Bytes {
+    let value = this.get("caller");
     return value!.toBytes();
   }
 
-  set sender(value: Bytes) {
-    this.set("sender", Value.fromBytes(value));
+  set caller(value: Bytes) {
+    this.set("caller", Value.fromBytes(value));
   }
 
-  get price(): BigInt {
-    let value = this.get("price");
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value!.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
+  }
+
+  get receiver(): Bytes {
+    let value = this.get("receiver");
+    return value!.toBytes();
+  }
+
+  set receiver(value: Bytes) {
+    this.set("receiver", Value.fromBytes(value));
+  }
+
+  get shares(): BigInt {
+    let value = this.get("shares");
     return value!.toBigInt();
   }
 
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
-  }
-
-  get amount(): BigInt {
-    let value = this.get("amount");
-    return value!.toBigInt();
-  }
-
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
+  set shares(value: BigInt) {
+    this.set("shares", Value.fromBigInt(value));
   }
 }
 
@@ -1482,40 +1512,6 @@ export class Construction extends Entity {
       this.unset("uri");
     } else {
       this.set("uri", Value.fromString(<string>value));
-    }
-  }
-
-  get erc20OverburnNumerator(): BigInt | null {
-    let value = this.get("erc20OverburnNumerator");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set erc20OverburnNumerator(value: BigInt | null) {
-    if (!value) {
-      this.unset("erc20OverburnNumerator");
-    } else {
-      this.set("erc20OverburnNumerator", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get erc20OverburnDenominator(): BigInt | null {
-    let value = this.get("erc20OverburnDenominator");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set erc20OverburnDenominator(value: BigInt | null) {
-    if (!value) {
-      this.unset("erc20OverburnDenominator");
-    } else {
-      this.set("erc20OverburnDenominator", Value.fromBigInt(<BigInt>value));
     }
   }
 

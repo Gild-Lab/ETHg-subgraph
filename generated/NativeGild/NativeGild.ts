@@ -75,7 +75,7 @@ export class Construction__Params {
     this._event = event;
   }
 
-  get sender(): Address {
+  get caller(): Address {
     return this._event.parameters[0].value.toAddress();
   }
 
@@ -87,54 +87,54 @@ export class Construction__Params {
 }
 
 export class ConstructionConfigStruct extends ethereum.Tuple {
-  get name(): string {
-    return this[0].toString();
+  get asset(): Address {
+    return this[0].toAddress();
   }
 
-  get symbol(): string {
+  get name(): string {
     return this[1].toString();
   }
 
-  get uri(): string {
+  get symbol(): string {
     return this[2].toString();
   }
 
-  get erc20OverburnNumerator(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get erc20OverburnDenominator(): BigInt {
-    return this[4].toBigInt();
+  get uri(): string {
+    return this[3].toString();
   }
 
   get priceOracle(): Address {
-    return this[5].toAddress();
+    return this[4].toAddress();
   }
 }
 
-export class Gild extends ethereum.Event {
-  get params(): Gild__Params {
-    return new Gild__Params(this);
+export class Deposit extends ethereum.Event {
+  get params(): Deposit__Params {
+    return new Deposit__Params(this);
   }
 }
 
-export class Gild__Params {
-  _event: Gild;
+export class Deposit__Params {
+  _event: Deposit;
 
-  constructor(event: Gild) {
+  constructor(event: Deposit) {
     this._event = event;
   }
 
-  get sender(): Address {
+  get caller(): Address {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get price(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+  get owner(): Address {
+    return this._event.parameters[1].value.toAddress();
   }
 
-  get amount(): BigInt {
+  get assets(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -254,29 +254,37 @@ export class URI__Params {
   }
 }
 
-export class Ungild extends ethereum.Event {
-  get params(): Ungild__Params {
-    return new Ungild__Params(this);
+export class Withdraw extends ethereum.Event {
+  get params(): Withdraw__Params {
+    return new Withdraw__Params(this);
   }
 }
 
-export class Ungild__Params {
-  _event: Ungild;
+export class Withdraw__Params {
+  _event: Withdraw;
 
-  constructor(event: Ungild) {
+  constructor(event: Withdraw) {
     this._event = event;
   }
 
-  get sender(): Address {
+  get caller(): Address {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get price(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+  get receiver(): Address {
+    return this._event.parameters[1].value.toAddress();
   }
 
-  get amount(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
+  get owner(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+
+  get assets(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
   }
 }
 
@@ -327,6 +335,21 @@ export class NativeGild extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  asset(): Address {
+    let result = super.call("asset", "asset():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_asset(): ethereum.CallResult<Address> {
+    let result = super.tryCall("asset", "asset():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   balanceOf(account: Address, id: BigInt): BigInt {
@@ -409,6 +432,52 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigIntArray());
   }
 
+  convertToAssets(shares_: BigInt): BigInt {
+    let result = super.call(
+      "convertToAssets",
+      "convertToAssets(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(shares_)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_convertToAssets(shares_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "convertToAssets",
+      "convertToAssets(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(shares_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  convertToShares(assets_: BigInt): BigInt {
+    let result = super.call(
+      "convertToShares",
+      "convertToShares(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_convertToShares(assets_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "convertToShares",
+      "convertToShares(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   decimals(): i32 {
     let result = super.call("decimals", "decimals():(uint8)", []);
 
@@ -456,21 +525,26 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  erc20OverburnDenominator(): BigInt {
-    let result = super.call(
-      "erc20OverburnDenominator",
-      "erc20OverburnDenominator():(uint256)",
-      []
-    );
+  deposit(assets_: BigInt, receiver_: Address): BigInt {
+    let result = super.call("deposit", "deposit(uint256,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(assets_),
+      ethereum.Value.fromAddress(receiver_)
+    ]);
 
     return result[0].toBigInt();
   }
 
-  try_erc20OverburnDenominator(): ethereum.CallResult<BigInt> {
+  try_deposit(
+    assets_: BigInt,
+    receiver_: Address
+  ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "erc20OverburnDenominator",
-      "erc20OverburnDenominator():(uint256)",
-      []
+      "deposit",
+      "deposit(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_)
+      ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -479,21 +553,33 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  erc20OverburnNumerator(): BigInt {
+  deposit1(assets_: BigInt, receiver_: Address, minPrice_: BigInt): BigInt {
     let result = super.call(
-      "erc20OverburnNumerator",
-      "erc20OverburnNumerator():(uint256)",
-      []
+      "deposit",
+      "deposit(uint256,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minPrice_)
+      ]
     );
 
     return result[0].toBigInt();
   }
 
-  try_erc20OverburnNumerator(): ethereum.CallResult<BigInt> {
+  try_deposit1(
+    assets_: BigInt,
+    receiver_: Address,
+    minPrice_: BigInt
+  ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "erc20OverburnNumerator",
-      "erc20OverburnNumerator():(uint256)",
-      []
+      "deposit",
+      "deposit(uint256,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minPrice_)
+      ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -566,6 +652,216 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
+  maxDeposit(param0: Address): BigInt {
+    let result = super.call("maxDeposit", "maxDeposit(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_maxDeposit(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("maxDeposit", "maxDeposit(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  maxMint(param0: Address): BigInt {
+    let result = super.call("maxMint", "maxMint(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_maxMint(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("maxMint", "maxMint(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  maxRedeem(owner_: Address, price_: BigInt): BigInt {
+    let result = super.call(
+      "maxRedeem",
+      "maxRedeem(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_maxRedeem(owner_: Address, price_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "maxRedeem",
+      "maxRedeem(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  maxRedeem1(owner_: Address): BigInt {
+    let result = super.call("maxRedeem", "maxRedeem(address):(uint256)", [
+      ethereum.Value.fromAddress(owner_)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_maxRedeem1(owner_: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("maxRedeem", "maxRedeem(address):(uint256)", [
+      ethereum.Value.fromAddress(owner_)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  maxWithdraw(owner_: Address, price_: BigInt): BigInt {
+    let result = super.call(
+      "maxWithdraw",
+      "maxWithdraw(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_maxWithdraw(
+    owner_: Address,
+    price_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "maxWithdraw",
+      "maxWithdraw(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  maxWithdraw1(owner_: Address): BigInt {
+    let result = super.call("maxWithdraw", "maxWithdraw(address):(uint256)", [
+      ethereum.Value.fromAddress(owner_)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_maxWithdraw1(owner_: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "maxWithdraw",
+      "maxWithdraw(address):(uint256)",
+      [ethereum.Value.fromAddress(owner_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  minPrices(param0: Address): BigInt {
+    let result = super.call("minPrices", "minPrices(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_minPrices(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("minPrices", "minPrices(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  mint(shares_: BigInt, receiver_: Address, minPrice_: BigInt): BigInt {
+    let result = super.call("mint", "mint(uint256,address,uint256):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(shares_),
+      ethereum.Value.fromAddress(receiver_),
+      ethereum.Value.fromUnsignedBigInt(minPrice_)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_mint(
+    shares_: BigInt,
+    receiver_: Address,
+    minPrice_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "mint",
+      "mint(uint256,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minPrice_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  mint1(shares_: BigInt, receiver_: Address): BigInt {
+    let result = super.call("mint", "mint(uint256,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(shares_),
+      ethereum.Value.fromAddress(receiver_)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_mint1(shares_: BigInt, receiver_: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("mint", "mint(uint256,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(shares_),
+      ethereum.Value.fromAddress(receiver_)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   name(): string {
     let result = super.call("name", "name():(string)", []);
 
@@ -581,6 +877,160 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
+  previewDeposit(assets_: BigInt): BigInt {
+    let result = super.call(
+      "previewDeposit",
+      "previewDeposit(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_previewDeposit(assets_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewDeposit",
+      "previewDeposit(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  previewMint(shares_: BigInt): BigInt {
+    let result = super.call("previewMint", "previewMint(uint256):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(shares_)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_previewMint(shares_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewMint",
+      "previewMint(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(shares_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  previewRedeem(shares_: BigInt): BigInt {
+    let result = super.call(
+      "previewRedeem",
+      "previewRedeem(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(shares_)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_previewRedeem(shares_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewRedeem",
+      "previewRedeem(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(shares_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  previewRedeem1(shares_: BigInt, price_: BigInt): BigInt {
+    let result = super.call(
+      "previewRedeem",
+      "previewRedeem(uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_previewRedeem1(
+    shares_: BigInt,
+    price_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewRedeem",
+      "previewRedeem(uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  previewWithdraw(assets_: BigInt): BigInt {
+    let result = super.call(
+      "previewWithdraw",
+      "previewWithdraw(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_previewWithdraw(assets_: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewWithdraw",
+      "previewWithdraw(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(assets_)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  previewWithdraw1(assets_: BigInt, price_: BigInt): BigInt {
+    let result = super.call(
+      "previewWithdraw",
+      "previewWithdraw(uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_previewWithdraw1(
+    assets_: BigInt,
+    price_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "previewWithdraw",
+      "previewWithdraw(uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   priceOracle(): Address {
     let result = super.call("priceOracle", "priceOracle():(address)", []);
 
@@ -594,6 +1044,103 @@ export class NativeGild extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  prices(param0: Address): BigInt {
+    let result = super.call("prices", "prices(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_prices(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("prices", "prices(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  redeem(
+    shares_: BigInt,
+    receiver_: Address,
+    owner_: Address,
+    price_: BigInt
+  ): BigInt {
+    let result = super.call(
+      "redeem",
+      "redeem(uint256,address,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_redeem(
+    shares_: BigInt,
+    receiver_: Address,
+    owner_: Address,
+    price_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "redeem",
+      "redeem(uint256,address,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  redeem1(shares_: BigInt, receiver_: Address, owner_: Address): BigInt {
+    let result = super.call(
+      "redeem",
+      "redeem(uint256,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_redeem1(
+    shares_: BigInt,
+    receiver_: Address,
+    owner_: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "redeem",
+      "redeem(uint256,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -632,6 +1179,21 @@ export class NativeGild extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  totalAssets(): BigInt {
+    let result = super.call("totalAssets", "totalAssets():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_totalAssets(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("totalAssets", "totalAssets():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   totalSupply(): BigInt {
@@ -723,6 +1285,84 @@ export class NativeGild extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
   }
+
+  withdraw(
+    assets_: BigInt,
+    receiver_: Address,
+    owner_: Address,
+    price_: BigInt
+  ): BigInt {
+    let result = super.call(
+      "withdraw",
+      "withdraw(uint256,address,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_withdraw(
+    assets_: BigInt,
+    receiver_: Address,
+    owner_: Address,
+    price_: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "withdraw",
+      "withdraw(uint256,address,address,uint256):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_),
+        ethereum.Value.fromUnsignedBigInt(price_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  withdraw1(assets_: BigInt, receiver_: Address, owner_: Address): BigInt {
+    let result = super.call(
+      "withdraw",
+      "withdraw(uint256,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_withdraw1(
+    assets_: BigInt,
+    receiver_: Address,
+    owner_: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "withdraw",
+      "withdraw(uint256,address,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromAddress(owner_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -758,28 +1398,24 @@ export class ConstructorCall__Outputs {
 }
 
 export class ConstructorCallConfig_Struct extends ethereum.Tuple {
-  get name(): string {
-    return this[0].toString();
+  get asset(): Address {
+    return this[0].toAddress();
   }
 
-  get symbol(): string {
+  get name(): string {
     return this[1].toString();
   }
 
-  get uri(): string {
+  get symbol(): string {
     return this[2].toString();
   }
 
-  get erc20OverburnNumerator(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get erc20OverburnDenominator(): BigInt {
-    return this[4].toBigInt();
+  get uri(): string {
+    return this[3].toString();
   }
 
   get priceOracle(): Address {
-    return this[5].toAddress();
+    return this[4].toAddress();
   }
 }
 
@@ -859,32 +1495,78 @@ export class DecreaseAllowanceCall__Outputs {
   }
 }
 
-export class GildCall extends ethereum.Call {
-  get inputs(): GildCall__Inputs {
-    return new GildCall__Inputs(this);
+export class DepositCall extends ethereum.Call {
+  get inputs(): DepositCall__Inputs {
+    return new DepositCall__Inputs(this);
   }
 
-  get outputs(): GildCall__Outputs {
-    return new GildCall__Outputs(this);
+  get outputs(): DepositCall__Outputs {
+    return new DepositCall__Outputs(this);
   }
 }
 
-export class GildCall__Inputs {
-  _call: GildCall;
+export class DepositCall__Inputs {
+  _call: DepositCall;
 
-  constructor(call: GildCall) {
+  constructor(call: DepositCall) {
     this._call = call;
   }
 
-  get minPrice_(): BigInt {
+  get assets_(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
   }
 }
 
-export class GildCall__Outputs {
-  _call: GildCall;
+export class DepositCall__Outputs {
+  _call: DepositCall;
 
-  constructor(call: GildCall) {
+  constructor(call: DepositCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Deposit1Call extends ethereum.Call {
+  get inputs(): Deposit1Call__Inputs {
+    return new Deposit1Call__Inputs(this);
+  }
+
+  get outputs(): Deposit1Call__Outputs {
+    return new Deposit1Call__Outputs(this);
+  }
+}
+
+export class Deposit1Call__Inputs {
+  _call: Deposit1Call;
+
+  constructor(call: Deposit1Call) {
+    this._call = call;
+  }
+
+  get assets_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get minPrice_(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class Deposit1Call__Outputs {
+  _call: Deposit1Call;
+
+  constructor(call: Deposit1Call) {
     this._call = call;
   }
 
@@ -928,6 +1610,174 @@ export class IncreaseAllowanceCall__Outputs {
 
   get value0(): boolean {
     return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class MintCall extends ethereum.Call {
+  get inputs(): MintCall__Inputs {
+    return new MintCall__Inputs(this);
+  }
+
+  get outputs(): MintCall__Outputs {
+    return new MintCall__Outputs(this);
+  }
+}
+
+export class MintCall__Inputs {
+  _call: MintCall;
+
+  constructor(call: MintCall) {
+    this._call = call;
+  }
+
+  get shares_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get minPrice_(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class MintCall__Outputs {
+  _call: MintCall;
+
+  constructor(call: MintCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Mint1Call extends ethereum.Call {
+  get inputs(): Mint1Call__Inputs {
+    return new Mint1Call__Inputs(this);
+  }
+
+  get outputs(): Mint1Call__Outputs {
+    return new Mint1Call__Outputs(this);
+  }
+}
+
+export class Mint1Call__Inputs {
+  _call: Mint1Call;
+
+  constructor(call: Mint1Call) {
+    this._call = call;
+  }
+
+  get shares_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class Mint1Call__Outputs {
+  _call: Mint1Call;
+
+  constructor(call: Mint1Call) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class RedeemCall extends ethereum.Call {
+  get inputs(): RedeemCall__Inputs {
+    return new RedeemCall__Inputs(this);
+  }
+
+  get outputs(): RedeemCall__Outputs {
+    return new RedeemCall__Outputs(this);
+  }
+}
+
+export class RedeemCall__Inputs {
+  _call: RedeemCall;
+
+  constructor(call: RedeemCall) {
+    this._call = call;
+  }
+
+  get shares_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get owner_(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get price_(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+}
+
+export class RedeemCall__Outputs {
+  _call: RedeemCall;
+
+  constructor(call: RedeemCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Redeem1Call extends ethereum.Call {
+  get inputs(): Redeem1Call__Inputs {
+    return new Redeem1Call__Inputs(this);
+  }
+
+  get outputs(): Redeem1Call__Outputs {
+    return new Redeem1Call__Outputs(this);
+  }
+}
+
+export class Redeem1Call__Inputs {
+  _call: Redeem1Call;
+
+  constructor(call: Redeem1Call) {
+    this._call = call;
+  }
+
+  get shares_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get owner_(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+}
+
+export class Redeem1Call__Outputs {
+  _call: Redeem1Call;
+
+  constructor(call: Redeem1Call) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }
 
@@ -1057,6 +1907,66 @@ export class SetApprovalForAllCall__Outputs {
   }
 }
 
+export class SetMinPriceCall extends ethereum.Call {
+  get inputs(): SetMinPriceCall__Inputs {
+    return new SetMinPriceCall__Inputs(this);
+  }
+
+  get outputs(): SetMinPriceCall__Outputs {
+    return new SetMinPriceCall__Outputs(this);
+  }
+}
+
+export class SetMinPriceCall__Inputs {
+  _call: SetMinPriceCall;
+
+  constructor(call: SetMinPriceCall) {
+    this._call = call;
+  }
+
+  get minPrice_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetMinPriceCall__Outputs {
+  _call: SetMinPriceCall;
+
+  constructor(call: SetMinPriceCall) {
+    this._call = call;
+  }
+}
+
+export class SetPriceCall extends ethereum.Call {
+  get inputs(): SetPriceCall__Inputs {
+    return new SetPriceCall__Inputs(this);
+  }
+
+  get outputs(): SetPriceCall__Outputs {
+    return new SetPriceCall__Outputs(this);
+  }
+}
+
+export class SetPriceCall__Inputs {
+  _call: SetPriceCall;
+
+  constructor(call: SetPriceCall) {
+    this._call = call;
+  }
+
+  get price_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetPriceCall__Outputs {
+  _call: SetPriceCall;
+
+  constructor(call: SetPriceCall) {
+    this._call = call;
+  }
+}
+
 export class TransferCall extends ethereum.Call {
   get inputs(): TransferCall__Inputs {
     return new TransferCall__Inputs(this);
@@ -1137,36 +2047,90 @@ export class TransferFromCall__Outputs {
   }
 }
 
-export class UngildCall extends ethereum.Call {
-  get inputs(): UngildCall__Inputs {
-    return new UngildCall__Inputs(this);
+export class WithdrawCall extends ethereum.Call {
+  get inputs(): WithdrawCall__Inputs {
+    return new WithdrawCall__Inputs(this);
   }
 
-  get outputs(): UngildCall__Outputs {
-    return new UngildCall__Outputs(this);
+  get outputs(): WithdrawCall__Outputs {
+    return new WithdrawCall__Outputs(this);
   }
 }
 
-export class UngildCall__Inputs {
-  _call: UngildCall;
+export class WithdrawCall__Inputs {
+  _call: WithdrawCall;
 
-  constructor(call: UngildCall) {
+  constructor(call: WithdrawCall) {
     this._call = call;
   }
 
-  get price_(): BigInt {
+  get assets_(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get erc1155Amount_(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get owner_(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get price_(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
   }
 }
 
-export class UngildCall__Outputs {
-  _call: UngildCall;
+export class WithdrawCall__Outputs {
+  _call: WithdrawCall;
 
-  constructor(call: UngildCall) {
+  constructor(call: WithdrawCall) {
     this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Withdraw1Call extends ethereum.Call {
+  get inputs(): Withdraw1Call__Inputs {
+    return new Withdraw1Call__Inputs(this);
+  }
+
+  get outputs(): Withdraw1Call__Outputs {
+    return new Withdraw1Call__Outputs(this);
+  }
+}
+
+export class Withdraw1Call__Inputs {
+  _call: Withdraw1Call;
+
+  constructor(call: Withdraw1Call) {
+    this._call = call;
+  }
+
+  get assets_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get receiver_(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get owner_(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+}
+
+export class Withdraw1Call__Outputs {
+  _call: Withdraw1Call;
+
+  constructor(call: Withdraw1Call) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }

@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: NativeGild
-    network: matic
+    network: rinkeby
     source:
       abi: NativeGild
-      address: "0xF6156980A07346cA023896B281320c122347E7e5"
-      startBlock: 27445539
+      address: "0xEf6a1d20AF88Cc346E150649999161aD1D96F1Ac"
+      startBlock: 10821703
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -17,12 +17,12 @@ dataSources:
         - Approval
         - ApprovalForAll
         - Construction
-        - Gild
+        - Deposit
         - Transfer
         - TransferBatch
         - TransferSingle
         - URI
-        - Ungild
+        - Withdraw
       abis:
         - name: NativeGild
           file: NativeGild\abis\NativeGild.json
@@ -31,10 +31,10 @@ dataSources:
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Construction(address,(string,string,string,uint256,uint256,address))
+        - event: Construction(address,(address,string,string,string,address))
           handler: handleConstruction
-        - event: Gild(address,uint256,uint256)
-          handler: handleGild
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
@@ -43,16 +43,16 @@ dataSources:
           handler: handleTransferSingle
         - event: URI(string,indexed uint256)
           handler: handleURI
-        - event: Ungild(address,uint256,uint256)
-          handler: handleUngild
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
       file: NativeGild\NativeGild.wasm
   - kind: ethereum
     name: ChainlinkTwoFeedPriceOracle
-    network: matic
+    network: rinkeby
     source:
       abi: ChainlinkTwoFeedPriceOracle
-      address: "0x9b64bF291c526B01D82545DF544feAEdE410dC86"
-      startBlock: 27355829
+      address: "0x7f8Ff65Bf66E2c46Ba083CF9516553F9591c6F02"
+      startBlock: 10821701
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

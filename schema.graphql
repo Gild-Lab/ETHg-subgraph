@@ -125,18 +125,22 @@ type Transaction @entity {
 }
 
 
-type Gild @entity {
+type Deposit @entity {
   id: ID!
-  sender: Bytes!
-  price: BigInt!
-  amount: BigInt!
+  owner: Bytes!
+  shares: BigInt!
+  caller: Bytes!
+  assets: BigInt!
 }
 
-type Ungild @entity {
+type Withdraw @entity {
   id: ID!
-  sender: Bytes!
-  price: BigInt!
-  amount: BigInt!
+  assets: BigInt!
+  caller: Bytes!
+  owner: Bytes!
+  receiver: Bytes!
+  shares: BigInt!
+
 }
 
 type Construction @entity{
@@ -145,8 +149,6 @@ type Construction @entity{
   name: String
   symbol: String
   uri: String
-  erc20OverburnNumerator:BigInt
-  erc20OverburnDenominator: BigInt
   priceOracle: Bytes
 }
 
