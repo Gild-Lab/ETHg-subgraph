@@ -10,8 +10,11 @@ export function handleConstruction(event: Construction): void {
     if (!entity) {
       entity = new ReferencePrice(event.transaction.hash.toHex())
     }
-    entity.value = contract.price()
-    entity.save()
+
+    const price = contract.try_price()
+    if(!price.reverted)
+    entity.value = price.value
+    entity.save() 
 }
 
 export function handleBlock(block: ethereum.Block): void {
@@ -22,7 +25,10 @@ export function handleBlock(block: ethereum.Block): void {
   let blockEntity = new Block(id)
   blockEntity.hash = block.hash;
   blockEntity.parentHash = block.parentHash;
-  blockEntity.priceValue = contract.price()
+  const price = contract.try_price()
+  if(!price.reverted)
+    blockEntity.priceValue = price.value
+  
   blockEntity.number = block.number;
   blockEntity.save()
 }

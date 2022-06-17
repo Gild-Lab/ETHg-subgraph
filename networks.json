@@ -11,12 +11,12 @@
     },
     "rinkeby": {
         "NativeGild": {
-            "address": "0xEf6a1d20AF88Cc346E150649999161aD1D96F1Ac",
-            "startBlock": 10821703
+            "address": "0xBf7C84D95170492D5c8a8Afc218EE0f156A5F72f",
+            "startBlock": 10850863
         },
         "ChainlinkTwoFeedPriceOracle": {
-            "address": "0x7f8Ff65Bf66E2c46Ba083CF9516553F9591c6F02",
-            "startBlock": 10821701
+            "address": "0x796B529E595f5399200973Ad7D4af275bfd190C7",
+            "startBlock": 10850861
         }
     }
 }
