@@ -29,7 +29,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct ERC20GildConfig",
+        "internalType": "struct ConstructionConfig",
         "name": "config_",
         "type": "tuple"
       }
@@ -125,7 +125,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct ERC20GildConfig",
+        "internalType": "struct ConstructionConfig",
         "name": "config",
         "type": "tuple"
       }

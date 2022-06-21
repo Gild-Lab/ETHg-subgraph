@@ -7,8 +7,8 @@ dataSources:
     network: rinkeby
     source:
       abi: NativeGild
-      address: "0xBf7C84D95170492D5c8a8Afc218EE0f156A5F72f"
-      startBlock: 10850863
+      address: "0x3a215960d6a76378DbA1E558F36cEF4D82CCC919"
+      startBlock: 10884629
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -51,8 +51,8 @@ dataSources:
     network: rinkeby
     source:
       abi: ChainlinkTwoFeedPriceOracle
-      address: "0x796B529E595f5399200973Ad7D4af275bfd190C7"
-      startBlock: 10850861
+      address: "0x78Db568D987BFeb7c036294C1c9610e5F47ca710"
+      startBlock: 10884627
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

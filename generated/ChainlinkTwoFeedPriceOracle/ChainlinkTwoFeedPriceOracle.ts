@@ -52,6 +52,21 @@ export class ChainlinkTwoFeedPriceOracle extends ethereum.SmartContract {
     );
   }
 
+  base(): Address {
+    let result = super.call("base", "base():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_base(): ethereum.CallResult<Address> {
+    let result = super.tryCall("base", "base():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   price(): BigInt {
     let result = super.call("price", "price():(uint256)", []);
 
@@ -65,6 +80,21 @@ export class ChainlinkTwoFeedPriceOracle extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  quote(): Address {
+    let result = super.call("quote", "quote():(address)", []);
+
+    return result[0].toAddress();
+  }
+
+  try_quote(): ethereum.CallResult<Address> {
+    let result = super.tryCall("quote", "quote():(address)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 }
 

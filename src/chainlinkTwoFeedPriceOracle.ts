@@ -14,21 +14,22 @@ export function handleConstruction(event: Construction): void {
     const price = contract.try_price()
     if(!price.reverted)
     entity.value = price.value
+
     entity.save() 
 }
 
 export function handleBlock(block: ethereum.Block): void {
-  let id = block.hash.toHex()
+  // let id = block.hash.toHex()
 
-  let contract = ChainlinkTwoFeedPriceOracle.bind(dataSource.address())
+  // let contract = ChainlinkTwoFeedPriceOracle.bind(dataSource.address())
 
-  let blockEntity = new Block(id)
-  blockEntity.hash = block.hash;
-  blockEntity.parentHash = block.parentHash;
-  const price = contract.try_price()
-  if(!price.reverted)
-    blockEntity.priceValue = price.value
+  // let blockEntity = new Block(id)
+  // blockEntity.hash = block.hash;
+  // blockEntity.parentHash = block.parentHash;
+  // const price = contract.try_price()
+  // if(!price.reverted)
+  //   blockEntity.priceValue = price.value
   
-  blockEntity.number = block.number;
-  blockEntity.save()
+  // blockEntity.number = block.number;
+  // blockEntity.save()
 }
