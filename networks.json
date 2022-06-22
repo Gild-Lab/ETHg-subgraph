@@ -4,7 +4,7 @@
             "address": "0xF6156980A07346cA023896B281320c122347E7e5", 
             "startBlock": 27445539 
         },
-        "ChainlinkTwoFeedPriceOracle": {
+        "TwoPriceOracle": {
             "address": "0x9b64bF291c526B01D82545DF544feAEdE410dC86",
             "startBlock": 27355829
         }
@@ -14,7 +14,7 @@
             "address": "0x3a215960d6a76378DbA1E558F36cEF4D82CCC919",
             "startBlock": 10884629
         },
-        "ChainlinkTwoFeedPriceOracle": {
+        "TwoPriceOracle": {
             "address": "0x78Db568D987BFeb7c036294C1c9610e5F47ca710",
             "startBlock": 10884627
         }

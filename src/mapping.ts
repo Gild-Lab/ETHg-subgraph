@@ -38,7 +38,6 @@ import {
 } from '@amxx/graphprotocol-utils'
 
 
-import {ChainlinkTwoFeedPriceOracle } from "../generated/ChainlinkTwoFeedPriceOracle/ChainlinkTwoFeedPriceOracle"
 
 
 function registerTransfer(

@@ -47,10 +47,10 @@ dataSources:
           handler: handleWithdraw
       file: ./src/mapping.ts
   - kind: ethereum
-    name: ChainlinkTwoFeedPriceOracle
+    name: TwoPriceOracle
     network: rinkeby
     source:
-      abi: ChainlinkTwoFeedPriceOracle
+      abi: TwoPriceOracle
       address: "0x78Db568D987BFeb7c036294C1c9610e5F47ca710"
       startBlock: 10884627
     mapping:
@@ -61,11 +61,11 @@ dataSources:
         - ReferencePrice
         - Block
       abis:
-        - name: ChainlinkTwoFeedPriceOracle
-          file: ./abis/ChainlinkTwoFeedPriceOracle.json
+        - name: TwoPriceOracle
+          file: ./abis/TwoPriceOracle.json
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
       blockHandlers:
         - handler: handleBlock
-      file: ./src/chainlinkTwoFeedPriceOracle.ts
+      file: ./src/TwoPriceOracle.ts
