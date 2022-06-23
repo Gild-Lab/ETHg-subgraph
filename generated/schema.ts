@@ -186,7 +186,7 @@ export class Account extends Entity {
   }
 }
 
-export class ERC20Contract extends Entity {
+export class erc20Contract extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -198,19 +198,19 @@ export class ERC20Contract extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save ERC20Contract entity without an ID");
+    assert(id != null, "Cannot save erc20Contract entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save ERC20Contract entity with non-string ID. " +
+        "Cannot save erc20Contract entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("ERC20Contract", id.toString(), this);
+      store.set("erc20Contract", id.toString(), this);
     }
   }
 
-  static load(id: string): ERC20Contract | null {
-    return changetype<ERC20Contract | null>(store.get("ERC20Contract", id));
+  static load(id: string): erc20Contract | null {
+    return changetype<erc20Contract | null>(store.get("erc20Contract", id));
   }
 
   get id(): string {
