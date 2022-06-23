@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: NativeGild
-    network: rinkeby
+    network: matic
     source:
       abi: NativeGild
-      address: "0x3a215960d6a76378DbA1E558F36cEF4D82CCC919"
-      startBlock: 10884629
+      address: "0x69930337839d5278E7fDEBb1529d9b32357419Bc"
+      startBlock: 29898416
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -48,11 +48,11 @@ dataSources:
       file: ./src/mapping.ts
   - kind: ethereum
     name: TwoPriceOracle
-    network: rinkeby
+    network: matic
     source:
       abi: TwoPriceOracle
-      address: "0x78Db568D987BFeb7c036294C1c9610e5F47ca710"
-      startBlock: 10884627
+      address: "0x52bc9566e47bbB4b938B7B9a8D4153462d8C4D8a"
+      startBlock: 29898410
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
