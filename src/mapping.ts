@@ -132,16 +132,6 @@ export function handleConstruction(event: ConstructionEvent): void {
 }
 
 export function handleDeposit(event: DepositEvent): void {
-	
-    let contract = NativeGild.bind(event.address)
-    contract.balanceOf1(event.params.owner)
-
-    // let entity = ReferencePrice.load(event.transaction.hash.toHex())
-    // if (!entity) {
-    //   entity = new ReferencePrice(event.transaction.hash.toHex())
-    // }
-    // entity.value = contract.price()
-    // entity.save()
 
   let entity = Deposit.load(event.transaction.hash.toHex())
   if (!entity) {

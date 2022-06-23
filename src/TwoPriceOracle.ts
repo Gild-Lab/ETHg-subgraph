@@ -13,10 +13,7 @@ export function handleConstruction(event: Construction): void {
 
     const price = contract.try_price()
     if( !price.reverted )
-    entity.value = price.value
-
-    entity.save() 
-
+      entity.value = price.value
 
   entity.save()
 }
@@ -37,7 +34,7 @@ export function handleBlock(block: ethereum.Block): void {
   
   if(!price.reverted)
     blockEntity.priceValue = price.value;
-  
+    
   blockEntity.number = block.number;
   blockEntity.save()
 }
