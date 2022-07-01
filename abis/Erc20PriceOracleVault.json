@@ -5,28 +5,35 @@
         "components": [
           {
             "internalType": "address",
-            "name": "asset",
-            "type": "address"
-          },
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "uri",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
             "name": "priceOracle",
             "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ConstructionConfig",
+            "name": "receiptVaultConfig",
+            "type": "tuple"
           }
         ],
         "internalType": "struct ConstructionConfig",
@@ -93,7 +100,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "caller",
+        "name": "sender",
         "type": "address"
       },
       {
@@ -117,11 +124,6 @@
             "internalType": "string",
             "name": "uri",
             "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "priceOracle",
-            "type": "address"
           }
         ],
         "indexed": false,
@@ -162,6 +164,97 @@
       }
     ],
     "name": "Deposit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "priceOracle",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct ConstructionConfig",
+            "name": "receiptVaultConfig",
+            "type": "tuple"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct ConstructionConfig",
+        "name": "config",
+        "type": "tuple"
+      }
+    ],
+    "name": "ERC20PriceOracleVaultConstruction",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "ReceiptInformation",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "Snapshot",
     "type": "event"
   },
   {
@@ -373,7 +466,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "assetTokenAddress_",
         "type": "address"
       }
     ],
@@ -426,6 +519,30 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "snapshotId",
+        "type": "uint256"
+      }
+    ],
+    "name": "balanceOfAt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address[]",
         "name": "accounts",
         "type": "address[]"
@@ -459,7 +576,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -478,7 +595,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -533,13 +650,23 @@
         "internalType": "address",
         "name": "receiver_",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minShareRatio_",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "receiptInformation_",
+        "type": "bytes"
       }
     ],
     "name": "deposit",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -557,18 +684,13 @@
         "internalType": "address",
         "name": "receiver_",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minPrice_",
-        "type": "uint256"
       }
     ],
     "name": "deposit",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -635,7 +757,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxAssets_",
         "type": "uint256"
       }
     ],
@@ -654,7 +776,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxShares_",
         "type": "uint256"
       }
     ],
@@ -678,7 +800,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxShares_",
         "type": "uint256"
       }
     ],
@@ -697,7 +819,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxShares_",
         "type": "uint256"
       }
     ],
@@ -713,7 +835,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "price_",
+        "name": "id_",
         "type": "uint256"
       }
     ],
@@ -721,7 +843,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxAssets_",
         "type": "uint256"
       }
     ],
@@ -740,7 +862,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "maxAssets_",
         "type": "uint256"
       }
     ],
@@ -755,7 +877,7 @@
         "type": "address"
       }
     ],
-    "name": "minPrices",
+    "name": "minShareRatios",
     "outputs": [
       {
         "internalType": "uint256",
@@ -777,18 +899,13 @@
         "internalType": "address",
         "name": "receiver_",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minPrice_",
-        "type": "uint256"
       }
     ],
     "name": "mint",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -806,14 +923,43 @@
         "internalType": "address",
         "name": "receiver_",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minShareRatio_",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "receiptInformation_",
+        "type": "bytes"
       }
     ],
     "name": "mint",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "multicall",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "results",
+        "type": "bytes[]"
       }
     ],
     "stateMutability": "nonpayable",
@@ -844,7 +990,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -863,7 +1009,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -882,7 +1028,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -898,7 +1044,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "price_",
+        "name": "id_",
         "type": "uint256"
       }
     ],
@@ -906,11 +1052,11 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -925,7 +1071,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -941,7 +1087,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "price_",
+        "name": "id_",
         "type": "uint256"
       }
     ],
@@ -949,11 +1095,11 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -972,20 +1118,19 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "prices",
-    "outputs": [
-      {
         "internalType": "uint256",
-        "name": "",
+        "name": "id_",
         "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data_",
+        "type": "bytes"
       }
     ],
-    "stateMutability": "view",
+    "name": "receiptInformation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1015,7 +1160,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -1044,7 +1189,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -1139,11 +1284,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "minPrice_",
+        "name": "minShareRatio_",
         "type": "uint256"
       }
     ],
-    "name": "setMinPrice",
+    "name": "setMinShareRatio",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1152,11 +1297,11 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "price_",
+        "name": "id_",
         "type": "uint256"
       }
     ],
-    "name": "setPrice",
+    "name": "setWithdrawId",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1199,7 +1344,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "assets_",
         "type": "uint256"
       }
     ],
@@ -1209,6 +1354,25 @@
   {
     "inputs": [],
     "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "snapshotId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalSupplyAt",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1318,7 +1482,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
@@ -1347,11 +1511,30 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "shares_",
         "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawIds",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

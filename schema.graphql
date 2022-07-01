@@ -149,7 +149,7 @@ type Construction @entity{
   name: String
   symbol: String
   uri: String
-  priceOracle: Bytes
+  asset: Bytes
 }
 
 type ReferencePrice @entity{

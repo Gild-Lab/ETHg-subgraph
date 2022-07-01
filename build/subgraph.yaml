@@ -3,12 +3,12 @@ schema:
   file: schema.graphql
 dataSources:
   - kind: ethereum
-    name: NativeGild
-    network: matic
+    name: Erc20PriceOracleVault
+    network: rinkeby
     source:
-      abi: NativeGild
-      address: "0x69930337839d5278E7fDEBb1529d9b32357419Bc"
-      startBlock: 29898416
+      abi: Erc20PriceOracleVault
+      address: "0xCFE71905427617A4c048420bFB3E6537A2ADF51b"
+      startBlock: 10947488
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -24,14 +24,14 @@ dataSources:
         - URI
         - Withdraw
       abis:
-        - name: NativeGild
-          file: NativeGild/abis/NativeGild.json
+        - name: Erc20PriceOracleVault
+          file: Erc20PriceOracleVault/abis/Erc20PriceOracleVault.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Construction(address,(address,string,string,string,address))
+        - event: Construction(address,(address,string,string,string))
           handler: handleConstruction
         - event: Deposit(indexed address,indexed address,uint256,uint256)
           handler: handleDeposit
@@ -45,14 +45,14 @@ dataSources:
           handler: handleURI
         - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleWithdraw
-      file: NativeGild/NativeGild.wasm
+      file: Erc20PriceOracleVault/Erc20PriceOracleVault.wasm
   - kind: ethereum
     name: TwoPriceOracle
-    network: matic
+    network: rinkeby
     source:
       abi: TwoPriceOracle
-      address: "0x52bc9566e47bbB4b938B7B9a8D4153462d8C4D8a"
-      startBlock: 29898410
+      address: "0x0C36Ece6f4b265827aa91a0d71Ff37113aE4eC69"
+      startBlock: 10947486
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

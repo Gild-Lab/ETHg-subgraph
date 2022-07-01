@@ -75,7 +75,7 @@ export class Construction__Params {
     this._event = event;
   }
 
-  get caller(): Address {
+  get sender(): Address {
     return this._event.parameters[0].value.toAddress();
   }
 
@@ -101,10 +101,6 @@ export class ConstructionConfigStruct extends ethereum.Tuple {
 
   get uri(): string {
     return this[3].toString();
-  }
-
-  get priceOracle(): Address {
-    return this[4].toAddress();
   }
 }
 
@@ -135,6 +131,104 @@ export class Deposit__Params {
 
   get shares(): BigInt {
     return this._event.parameters[3].value.toBigInt();
+  }
+}
+
+export class ERC20PriceOracleVaultConstruction extends ethereum.Event {
+  get params(): ERC20PriceOracleVaultConstruction__Params {
+    return new ERC20PriceOracleVaultConstruction__Params(this);
+  }
+}
+
+export class ERC20PriceOracleVaultConstruction__Params {
+  _event: ERC20PriceOracleVaultConstruction;
+
+  constructor(event: ERC20PriceOracleVaultConstruction) {
+    this._event = event;
+  }
+
+  get caller(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get config(): ERC20PriceOracleVaultConstructionConfigStruct {
+    return changetype<ERC20PriceOracleVaultConstructionConfigStruct>(
+      this._event.parameters[1].value.toTuple()
+    );
+  }
+}
+
+export class ERC20PriceOracleVaultConstructionConfigStruct extends ethereum.Tuple {
+  get priceOracle(): Address {
+    return this[0].toAddress();
+  }
+
+  get receiptVaultConfig(): ERC20PriceOracleVaultConstructionConfigReceiptVaultConfigStruct {
+    return changetype<
+      ERC20PriceOracleVaultConstructionConfigReceiptVaultConfigStruct
+    >(this[1].toTuple());
+  }
+}
+
+export class ERC20PriceOracleVaultConstructionConfigReceiptVaultConfigStruct extends ethereum.Tuple {
+  get asset(): Address {
+    return this[0].toAddress();
+  }
+
+  get name(): string {
+    return this[1].toString();
+  }
+
+  get symbol(): string {
+    return this[2].toString();
+  }
+
+  get uri(): string {
+    return this[3].toString();
+  }
+}
+
+export class ReceiptInformation extends ethereum.Event {
+  get params(): ReceiptInformation__Params {
+    return new ReceiptInformation__Params(this);
+  }
+}
+
+export class ReceiptInformation__Params {
+  _event: ReceiptInformation;
+
+  constructor(event: ReceiptInformation) {
+    this._event = event;
+  }
+
+  get sender(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get data(): Bytes {
+    return this._event.parameters[2].value.toBytes();
+  }
+}
+
+export class Snapshot extends ethereum.Event {
+  get params(): Snapshot__Params {
+    return new Snapshot__Params(this);
+  }
+}
+
+export class Snapshot__Params {
+  _event: Snapshot;
+
+  constructor(event: Snapshot) {
+    this._event = event;
+  }
+
+  get id(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
   }
 }
 
@@ -288,9 +382,9 @@ export class Withdraw__Params {
   }
 }
 
-export class NativeGild extends ethereum.SmartContract {
-  static bind(address: Address): NativeGild {
-    return new NativeGild("NativeGild", address);
+export class Erc20PriceOracleVault extends ethereum.SmartContract {
+  static bind(address: Address): Erc20PriceOracleVault {
+    return new Erc20PriceOracleVault("Erc20PriceOracleVault", address);
   }
 
   allowance(owner: Address, spender: Address): BigInt {
@@ -393,6 +487,38 @@ export class NativeGild extends ethereum.SmartContract {
     let result = super.tryCall("balanceOf", "balanceOf(address):(uint256)", [
       ethereum.Value.fromAddress(account)
     ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  balanceOfAt(account: Address, snapshotId: BigInt): BigInt {
+    let result = super.call(
+      "balanceOfAt",
+      "balanceOfAt(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(account),
+        ethereum.Value.fromUnsignedBigInt(snapshotId)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_balanceOfAt(
+    account: Address,
+    snapshotId: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "balanceOfAt",
+      "balanceOfAt(address,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(account),
+        ethereum.Value.fromUnsignedBigInt(snapshotId)
+      ]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -525,25 +651,40 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  deposit(assets_: BigInt, receiver_: Address): BigInt {
-    let result = super.call("deposit", "deposit(uint256,address):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(assets_),
-      ethereum.Value.fromAddress(receiver_)
-    ]);
+  deposit(
+    assets_: BigInt,
+    receiver_: Address,
+    minShareRatio_: BigInt,
+    receiptInformation_: Bytes
+  ): BigInt {
+    let result = super.call(
+      "deposit",
+      "deposit(uint256,address,uint256,bytes):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(assets_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minShareRatio_),
+        ethereum.Value.fromBytes(receiptInformation_)
+      ]
+    );
 
     return result[0].toBigInt();
   }
 
   try_deposit(
     assets_: BigInt,
-    receiver_: Address
+    receiver_: Address,
+    minShareRatio_: BigInt,
+    receiptInformation_: Bytes
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "deposit",
-      "deposit(uint256,address):(uint256)",
+      "deposit(uint256,address,uint256,bytes):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(assets_),
-        ethereum.Value.fromAddress(receiver_)
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minShareRatio_),
+        ethereum.Value.fromBytes(receiptInformation_)
       ]
     );
     if (result.reverted) {
@@ -553,32 +694,25 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  deposit1(assets_: BigInt, receiver_: Address, minPrice_: BigInt): BigInt {
-    let result = super.call(
-      "deposit",
-      "deposit(uint256,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(assets_),
-        ethereum.Value.fromAddress(receiver_),
-        ethereum.Value.fromUnsignedBigInt(minPrice_)
-      ]
-    );
+  deposit1(assets_: BigInt, receiver_: Address): BigInt {
+    let result = super.call("deposit", "deposit(uint256,address):(uint256)", [
+      ethereum.Value.fromUnsignedBigInt(assets_),
+      ethereum.Value.fromAddress(receiver_)
+    ]);
 
     return result[0].toBigInt();
   }
 
   try_deposit1(
     assets_: BigInt,
-    receiver_: Address,
-    minPrice_: BigInt
+    receiver_: Address
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "deposit",
-      "deposit(uint256,address,uint256):(uint256)",
+      "deposit(uint256,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(assets_),
-        ethereum.Value.fromAddress(receiver_),
-        ethereum.Value.fromUnsignedBigInt(minPrice_)
+        ethereum.Value.fromAddress(receiver_)
       ]
     );
     if (result.reverted) {
@@ -738,29 +872,26 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  maxWithdraw(owner_: Address, price_: BigInt): BigInt {
+  maxWithdraw(owner_: Address, id_: BigInt): BigInt {
     let result = super.call(
       "maxWithdraw",
       "maxWithdraw(address,uint256):(uint256)",
       [
         ethereum.Value.fromAddress(owner_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
 
     return result[0].toBigInt();
   }
 
-  try_maxWithdraw(
-    owner_: Address,
-    price_: BigInt
-  ): ethereum.CallResult<BigInt> {
+  try_maxWithdraw(owner_: Address, id_: BigInt): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "maxWithdraw",
       "maxWithdraw(address,uint256):(uint256)",
       [
         ethereum.Value.fromAddress(owner_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
     if (result.reverted) {
@@ -791,48 +922,21 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  minPrices(param0: Address): BigInt {
-    let result = super.call("minPrices", "minPrices(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
+  minShareRatios(param0: Address): BigInt {
+    let result = super.call(
+      "minShareRatios",
+      "minShareRatios(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)]
+    );
 
     return result[0].toBigInt();
   }
 
-  try_minPrices(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("minPrices", "minPrices(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  mint(shares_: BigInt, receiver_: Address, minPrice_: BigInt): BigInt {
-    let result = super.call("mint", "mint(uint256,address,uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(shares_),
-      ethereum.Value.fromAddress(receiver_),
-      ethereum.Value.fromUnsignedBigInt(minPrice_)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_mint(
-    shares_: BigInt,
-    receiver_: Address,
-    minPrice_: BigInt
-  ): ethereum.CallResult<BigInt> {
+  try_minShareRatios(param0: Address): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "mint",
-      "mint(uint256,address,uint256):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(shares_),
-        ethereum.Value.fromAddress(receiver_),
-        ethereum.Value.fromUnsignedBigInt(minPrice_)
-      ]
+      "minShareRatios",
+      "minShareRatios(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -841,7 +945,7 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  mint1(shares_: BigInt, receiver_: Address): BigInt {
+  mint(shares_: BigInt, receiver_: Address): BigInt {
     let result = super.call("mint", "mint(uint256,address):(uint256)", [
       ethereum.Value.fromUnsignedBigInt(shares_),
       ethereum.Value.fromAddress(receiver_)
@@ -850,7 +954,7 @@ export class NativeGild extends ethereum.SmartContract {
     return result[0].toBigInt();
   }
 
-  try_mint1(shares_: BigInt, receiver_: Address): ethereum.CallResult<BigInt> {
+  try_mint(shares_: BigInt, receiver_: Address): ethereum.CallResult<BigInt> {
     let result = super.tryCall("mint", "mint(uint256,address):(uint256)", [
       ethereum.Value.fromUnsignedBigInt(shares_),
       ethereum.Value.fromAddress(receiver_)
@@ -860,6 +964,68 @@ export class NativeGild extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  mint1(
+    shares_: BigInt,
+    receiver_: Address,
+    minShareRatio_: BigInt,
+    receiptInformation_: Bytes
+  ): BigInt {
+    let result = super.call(
+      "mint",
+      "mint(uint256,address,uint256,bytes):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minShareRatio_),
+        ethereum.Value.fromBytes(receiptInformation_)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_mint1(
+    shares_: BigInt,
+    receiver_: Address,
+    minShareRatio_: BigInt,
+    receiptInformation_: Bytes
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "mint",
+      "mint(uint256,address,uint256,bytes):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(shares_),
+        ethereum.Value.fromAddress(receiver_),
+        ethereum.Value.fromUnsignedBigInt(minShareRatio_),
+        ethereum.Value.fromBytes(receiptInformation_)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  multicall(data: Array<Bytes>): Array<Bytes> {
+    let result = super.call("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data)
+    ]);
+
+    return result[0].toBytesArray();
+  }
+
+  try_multicall(data: Array<Bytes>): ethereum.CallResult<Array<Bytes>> {
+    let result = super.tryCall("multicall", "multicall(bytes[]):(bytes[])", [
+      ethereum.Value.fromBytesArray(data)
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytesArray());
   }
 
   name(): string {
@@ -944,13 +1110,13 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  previewRedeem1(shares_: BigInt, price_: BigInt): BigInt {
+  previewRedeem1(shares_: BigInt, id_: BigInt): BigInt {
     let result = super.call(
       "previewRedeem",
       "previewRedeem(uint256,uint256):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(shares_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
 
@@ -959,14 +1125,14 @@ export class NativeGild extends ethereum.SmartContract {
 
   try_previewRedeem1(
     shares_: BigInt,
-    price_: BigInt
+    id_: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "previewRedeem",
       "previewRedeem(uint256,uint256):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(shares_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
     if (result.reverted) {
@@ -999,13 +1165,13 @@ export class NativeGild extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  previewWithdraw1(assets_: BigInt, price_: BigInt): BigInt {
+  previewWithdraw1(assets_: BigInt, id_: BigInt): BigInt {
     let result = super.call(
       "previewWithdraw",
       "previewWithdraw(uint256,uint256):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(assets_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
 
@@ -1014,14 +1180,14 @@ export class NativeGild extends ethereum.SmartContract {
 
   try_previewWithdraw1(
     assets_: BigInt,
-    price_: BigInt
+    id_: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "previewWithdraw",
       "previewWithdraw(uint256,uint256):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(assets_),
-        ethereum.Value.fromUnsignedBigInt(price_)
+        ethereum.Value.fromUnsignedBigInt(id_)
       ]
     );
     if (result.reverted) {
@@ -1044,25 +1210,6 @@ export class NativeGild extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  prices(param0: Address): BigInt {
-    let result = super.call("prices", "prices(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_prices(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("prices", "prices(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   redeem(
@@ -1204,6 +1351,29 @@ export class NativeGild extends ethereum.SmartContract {
 
   try_totalSupply(): ethereum.CallResult<BigInt> {
     let result = super.tryCall("totalSupply", "totalSupply():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  totalSupplyAt(snapshotId: BigInt): BigInt {
+    let result = super.call(
+      "totalSupplyAt",
+      "totalSupplyAt(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(snapshotId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_totalSupplyAt(snapshotId: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "totalSupplyAt",
+      "totalSupplyAt(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(snapshotId)]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -1363,6 +1533,27 @@ export class NativeGild extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
+
+  withdrawIds(param0: Address): BigInt {
+    let result = super.call("withdrawIds", "withdrawIds(address):(uint256)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBigInt();
+  }
+
+  try_withdrawIds(param0: Address): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "withdrawIds",
+      "withdrawIds(address):(uint256)",
+      [ethereum.Value.fromAddress(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
 }
 
 export class ConstructorCall extends ethereum.Call {
@@ -1398,6 +1589,18 @@ export class ConstructorCall__Outputs {
 }
 
 export class ConstructorCallConfig_Struct extends ethereum.Tuple {
+  get priceOracle(): Address {
+    return this[0].toAddress();
+  }
+
+  get receiptVaultConfig(): ConstructorCallConfig_ReceiptVaultConfigStruct {
+    return changetype<ConstructorCallConfig_ReceiptVaultConfigStruct>(
+      this[1].toTuple()
+    );
+  }
+}
+
+export class ConstructorCallConfig_ReceiptVaultConfigStruct extends ethereum.Tuple {
   get asset(): Address {
     return this[0].toAddress();
   }
@@ -1412,10 +1615,6 @@ export class ConstructorCallConfig_Struct extends ethereum.Tuple {
 
   get uri(): string {
     return this[3].toString();
-  }
-
-  get priceOracle(): Address {
-    return this[4].toAddress();
   }
 }
 
@@ -1519,6 +1718,14 @@ export class DepositCall__Inputs {
   get receiver_(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
+
+  get minShareRatio_(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get receiptInformation_(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
 }
 
 export class DepositCall__Outputs {
@@ -1528,7 +1735,7 @@ export class DepositCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get shares_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -1557,10 +1764,6 @@ export class Deposit1Call__Inputs {
   get receiver_(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
-
-  get minPrice_(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
-  }
 }
 
 export class Deposit1Call__Outputs {
@@ -1570,7 +1773,7 @@ export class Deposit1Call__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get shares_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -1637,10 +1840,6 @@ export class MintCall__Inputs {
   get receiver_(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
-
-  get minPrice_(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
-  }
 }
 
 export class MintCall__Outputs {
@@ -1650,7 +1849,7 @@ export class MintCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get assets_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -1679,6 +1878,14 @@ export class Mint1Call__Inputs {
   get receiver_(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
+
+  get minShareRatio_(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get receiptInformation_(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
+  }
 }
 
 export class Mint1Call__Outputs {
@@ -1688,8 +1895,76 @@ export class Mint1Call__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get assets_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class MulticallCall extends ethereum.Call {
+  get inputs(): MulticallCall__Inputs {
+    return new MulticallCall__Inputs(this);
+  }
+
+  get outputs(): MulticallCall__Outputs {
+    return new MulticallCall__Outputs(this);
+  }
+}
+
+export class MulticallCall__Inputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get data(): Array<Bytes> {
+    return this._call.inputValues[0].value.toBytesArray();
+  }
+}
+
+export class MulticallCall__Outputs {
+  _call: MulticallCall;
+
+  constructor(call: MulticallCall) {
+    this._call = call;
+  }
+
+  get results(): Array<Bytes> {
+    return this._call.outputValues[0].value.toBytesArray();
+  }
+}
+
+export class ReceiptInformationCall extends ethereum.Call {
+  get inputs(): ReceiptInformationCall__Inputs {
+    return new ReceiptInformationCall__Inputs(this);
+  }
+
+  get outputs(): ReceiptInformationCall__Outputs {
+    return new ReceiptInformationCall__Outputs(this);
+  }
+}
+
+export class ReceiptInformationCall__Inputs {
+  _call: ReceiptInformationCall;
+
+  constructor(call: ReceiptInformationCall) {
+    this._call = call;
+  }
+
+  get id_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get data_(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
+  }
+}
+
+export class ReceiptInformationCall__Outputs {
+  _call: ReceiptInformationCall;
+
+  constructor(call: ReceiptInformationCall) {
+    this._call = call;
   }
 }
 
@@ -1734,7 +2009,7 @@ export class RedeemCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get assets_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -1776,7 +2051,7 @@ export class Redeem1Call__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get assets_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -1907,62 +2182,62 @@ export class SetApprovalForAllCall__Outputs {
   }
 }
 
-export class SetMinPriceCall extends ethereum.Call {
-  get inputs(): SetMinPriceCall__Inputs {
-    return new SetMinPriceCall__Inputs(this);
+export class SetMinShareRatioCall extends ethereum.Call {
+  get inputs(): SetMinShareRatioCall__Inputs {
+    return new SetMinShareRatioCall__Inputs(this);
   }
 
-  get outputs(): SetMinPriceCall__Outputs {
-    return new SetMinPriceCall__Outputs(this);
+  get outputs(): SetMinShareRatioCall__Outputs {
+    return new SetMinShareRatioCall__Outputs(this);
   }
 }
 
-export class SetMinPriceCall__Inputs {
-  _call: SetMinPriceCall;
+export class SetMinShareRatioCall__Inputs {
+  _call: SetMinShareRatioCall;
 
-  constructor(call: SetMinPriceCall) {
+  constructor(call: SetMinShareRatioCall) {
     this._call = call;
   }
 
-  get minPrice_(): BigInt {
+  get minShareRatio_(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 }
 
-export class SetMinPriceCall__Outputs {
-  _call: SetMinPriceCall;
+export class SetMinShareRatioCall__Outputs {
+  _call: SetMinShareRatioCall;
 
-  constructor(call: SetMinPriceCall) {
+  constructor(call: SetMinShareRatioCall) {
     this._call = call;
   }
 }
 
-export class SetPriceCall extends ethereum.Call {
-  get inputs(): SetPriceCall__Inputs {
-    return new SetPriceCall__Inputs(this);
+export class SetWithdrawIdCall extends ethereum.Call {
+  get inputs(): SetWithdrawIdCall__Inputs {
+    return new SetWithdrawIdCall__Inputs(this);
   }
 
-  get outputs(): SetPriceCall__Outputs {
-    return new SetPriceCall__Outputs(this);
+  get outputs(): SetWithdrawIdCall__Outputs {
+    return new SetWithdrawIdCall__Outputs(this);
   }
 }
 
-export class SetPriceCall__Inputs {
-  _call: SetPriceCall;
+export class SetWithdrawIdCall__Inputs {
+  _call: SetWithdrawIdCall;
 
-  constructor(call: SetPriceCall) {
+  constructor(call: SetWithdrawIdCall) {
     this._call = call;
   }
 
-  get price_(): BigInt {
+  get id_(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 }
 
-export class SetPriceCall__Outputs {
-  _call: SetPriceCall;
+export class SetWithdrawIdCall__Outputs {
+  _call: SetWithdrawIdCall;
 
-  constructor(call: SetPriceCall) {
+  constructor(call: SetWithdrawIdCall) {
     this._call = call;
   }
 }
@@ -2088,7 +2363,7 @@ export class WithdrawCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get shares_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -2130,7 +2405,7 @@ export class Withdraw1Call__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get shares_(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }

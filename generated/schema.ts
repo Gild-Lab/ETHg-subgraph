@@ -1515,8 +1515,8 @@ export class Construction extends Entity {
     }
   }
 
-  get priceOracle(): Bytes | null {
-    let value = this.get("priceOracle");
+  get asset(): Bytes | null {
+    let value = this.get("asset");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1524,11 +1524,11 @@ export class Construction extends Entity {
     }
   }
 
-  set priceOracle(value: Bytes | null) {
+  set asset(value: Bytes | null) {
     if (!value) {
-      this.unset("priceOracle");
+      this.unset("asset");
     } else {
-      this.set("priceOracle", Value.fromBytes(<Bytes>value));
+      this.set("asset", Value.fromBytes(<Bytes>value));
     }
   }
 }

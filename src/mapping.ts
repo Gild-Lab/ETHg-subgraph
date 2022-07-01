@@ -1,6 +1,6 @@
 import { BigInt,  ethereum, Address } from "@graphprotocol/graph-ts"
 import {
-  NativeGild,
+  Erc20PriceOracleVault,
   Approval,
   ApprovalForAll,
   Construction as ConstructionEvent,
@@ -10,7 +10,7 @@ import {
   TransferSingle,
   URI,
   Withdraw as WithdrawEvent
-} from "../generated/NativeGild/NativeGild"
+} from "../generated/Erc20PriceOracleVault/Erc20PriceOracleVault"
 
 import { Deposit, Withdraw, Construction, Account, ERC20Transfer, ERC1155Contract, ERC1155Transfer } from "../generated/schema"
 import {
@@ -122,8 +122,8 @@ export function handleConstruction(event: ConstructionEvent): void {
     eve = new Construction(event.transaction.hash.toHex())
   }
   
-  eve.priceOracle =  event.params.config.priceOracle
-  eve.sender =   event.params.caller
+  eve.sender =  event.params.sender
+  eve.asset =   event.params.config.asset	
   eve.name = event.params.config.name
   eve.symbol = event.params.config.symbol
   eve.uri = event.params.config.uri
