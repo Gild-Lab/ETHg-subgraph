@@ -14,7 +14,7 @@
             "type": "address"
           }
         ],
-        "internalType": "struct ChainlinkTwoFeedPriceOracleConfig",
+        "internalType": "struct ConstructionConfig",
         "name": "config_",
         "type": "tuple"
       }
@@ -45,7 +45,7 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct ChainlinkTwoFeedPriceOracleConfig",
+        "internalType": "struct ConstructionConfig",
         "name": "config",
         "type": "tuple"
       }
@@ -55,12 +55,38 @@
   },
   {
     "inputs": [],
+    "name": "base",
+    "outputs": [
+      {
+        "internalType": "contract IPriceOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "price",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "price_",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "quote",
+    "outputs": [
+      {
+        "internalType": "contract IPriceOracle",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

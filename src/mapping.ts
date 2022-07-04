@@ -1,18 +1,18 @@
 import { BigInt,  ethereum, Address } from "@graphprotocol/graph-ts"
 import {
-  NativeGild,
+  Erc20PriceOracleVault,
   Approval,
   ApprovalForAll,
   Construction as ConstructionEvent,
-  Gild as GildEvent,
+  Deposit as DepositEvent,
   Transfer,
   TransferBatch,
   TransferSingle,
   URI,
-  Ungild as UngildEvent
-} from "../generated/NativeGild/NativeGild"
+  Withdraw as WithdrawEvent
+} from "../generated/Erc20PriceOracleVault/Erc20PriceOracleVault"
 
-import { Gild, Ungild, Construction, Account, ERC20Transfer, ERC1155Contract, ERC1155Transfer } from "../generated/schema"
+import { Deposit, Withdraw, Construction, Account, ERC20Transfer, ERC1155Contract, ERC1155Transfer } from "../generated/schema"
 import {
 	fetchERC20,
 	fetchERC20Approval,
@@ -38,7 +38,6 @@ import {
 } from '@amxx/graphprotocol-utils'
 
 
-import {ChainlinkTwoFeedPriceOracle } from "../generated/ChainlinkTwoFeedPriceOracle/ChainlinkTwoFeedPriceOracle"
 
 
 function registerTransfer(
@@ -123,37 +122,26 @@ export function handleConstruction(event: ConstructionEvent): void {
     eve = new Construction(event.transaction.hash.toHex())
   }
   
-  eve.priceOracle =  event.params.config.priceOracle
-  eve.sender =   event.params.sender
+  eve.sender =  event.params.sender
+  eve.asset =   event.params.config.asset	
   eve.name = event.params.config.name
   eve.symbol = event.params.config.symbol
   eve.uri = event.params.config.uri
-  eve.erc20OverburnNumerator = event.params.config.erc20OverburnNumerator
-  eve.erc20OverburnDenominator = event.params.config.erc20OverburnDenominator
 
   eve.save()
 }
 
-export function handleGild(event: GildEvent): void {
+export function handleDeposit(event: DepositEvent): void {
 
-
-    let contract = NativeGild.bind(event.address)
-    contract.balanceOf1(event.params.sender)
-
-    // let entity = ReferencePrice.load(event.transaction.hash.toHex())
-    // if (!entity) {
-    //   entity = new ReferencePrice(event.transaction.hash.toHex())
-    // }
-    // entity.value = contract.price()
-    // entity.save()
-
-  let entity = Gild.load(event.transaction.hash.toHex())
+  let entity = Deposit.load(event.transaction.hash.toHex())
   if (!entity) {
-    entity = new Gild(event.transaction.hash.toHex())
+    entity = new Deposit(event.transaction.hash.toHex())
   }
-  entity.sender = event.params.sender
-  entity.amount = event.params.amount
-  entity.price = event.params.price
+  entity.owner = event.params.owner
+  entity.shares = event.params.shares
+  entity.caller = event.params.caller
+  entity.assets = event.params.assets
+
   entity.save()
 }
 
@@ -184,7 +172,7 @@ export function handleTransfer(event: Transfer): void {
 	}
 
 	if (event.params.to.toHex() == constants.ADDRESS_ZERO) {
-		let totalSupply        = fetchERC20Balance(contract, null)
+		let totalSupply        = fetchERC20Balance(contract, null)  
 		totalSupply.valueExact = totalSupply.valueExact.minus(event.params.value)
 		totalSupply.value      = decimals.toDecimals(totalSupply.valueExact, contract.decimals)
 		totalSupply.save()
@@ -249,13 +237,16 @@ export function handleURI(event: URI): void {
 	token.save()
 }
 
-export function handleUngild(event: UngildEvent): void {
-  let entity = Ungild.load(event.transaction.hash.toHex())
+export function handleWithdraw(event: WithdrawEvent): void {
+  let entity = Withdraw.load(event.transaction.hash.toHex())
   if (!entity) {
-    entity = new Ungild(event.transaction.hash.toHex())
+    entity = new Withdraw(event.transaction.hash.toHex())
   }
-  entity.sender = event.params.sender
-  entity.amount =   event.params.amount
-  entity.price =   event.params.price
+  entity.assets = event.params.assets
+  entity.caller =   event.params.caller
+  entity.owner =   event.params.owner
+  entity.receiver =   event.params.receiver
+  entity.shares =   event.params.shares
+
   entity.save()
 }

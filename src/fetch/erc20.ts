@@ -4,7 +4,7 @@ import {
 
 import {
 	Account,
-	ERC20Contract,
+	erc20Contract,
 	ERC20Balance,
 	ERC20Approval,
 } from '../../generated/schema'
@@ -17,32 +17,32 @@ import {
 	fetchAccount
 } from './account'
 
-export function fetchERC20(address: Address): ERC20Contract {
+export function fetchERC20(address: Address): erc20Contract {
 	let account  = fetchAccount(address)
-	let contract = ERC20Contract.load(account.id)
+	let contract = erc20Contract.load(account.id)
 
 	if (contract == null) {
-		// let endpoint              = ERC20Contract.bind(address)
+		// let endpoint              = erc20Contract.bind(address)
 		// let name                  = endpoint.try_name()
 		// let symbol                = endpoint.try_symbol()
 		// let decimals              = endpoint.try_decimals()
-		contract                  = new ERC20Contract(account.id)
+		contract                  = new erc20Contract(account.id)
 
 		// // Common
 		// contract.name        = name.reverted     ? null : name.value
 		// contract.symbol      = symbol.reverted   ? null : symbol.value
 		contract.decimals    = 18
-		contract.totalSupply = fetchERC20Balance(contract as ERC20Contract, null).id
+		contract.totalSupply = fetchERC20Balance(contract as erc20Contract, null).id
 		contract.asAccount   = account.id
 		account.asERC20      = contract.id
 		contract.save()
 		account.save()
 	}
 
-	return contract as ERC20Contract
+	return contract as erc20Contract
 }
 
-export function fetchERC20Balance(contract: ERC20Contract, account: Account | null): ERC20Balance {
+export function fetchERC20Balance(contract: erc20Contract, account: Account | null): ERC20Balance {
 	let id      = contract.id.concat('/').concat(account ? account.id : 'totalSupply')
 	let balance = ERC20Balance.load(id)
 
@@ -58,7 +58,7 @@ export function fetchERC20Balance(contract: ERC20Contract, account: Account | nu
 	return balance as ERC20Balance
 }
 
-export function fetchERC20Approval(contract: ERC20Contract, owner: Account, spender: Account): ERC20Approval {
+export function fetchERC20Approval(contract: erc20Contract, owner: Account, spender: Account): ERC20Approval {
 	let id       = contract.id.concat('/').concat(owner.id).concat('/').concat(spender.id)
 	let approval = ERC20Approval.load(id)
 

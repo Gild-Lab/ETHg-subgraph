@@ -3,12 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: NativeGild
-    network: matic
+    name: Erc20PriceOracleVault
+    network: rinkeby
     source:
-      abi: NativeGild
-      address: "0xF6156980A07346cA023896B281320c122347E7e5"
-      startBlock: 27445539
+      abi: Erc20PriceOracleVault
+      address: "0xCFE71905427617A4c048420bFB3E6537A2ADF51b"
+      startBlock: 10947488
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -17,44 +17,42 @@ dataSources:
         - Approval
         - ApprovalForAll
         - Construction
-        - Gild
+        - Deposit
         - Transfer
         - TransferBatch
         - TransferSingle
         - URI
-        - Ungild
+        - Withdraw
       abis:
-        - name: NativeGild
-          file: ./abis/NativeGild.json
+        - name: Erc20PriceOracleVault
+          file: ./abis/Erc20PriceOracleVault.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Construction(address,(string,string,string,uint256,uint256,address))
+        - event: Construction(address,(address,string,string,string))
           handler: handleConstruction
-        - event: Gild(address,uint256,uint256)
-          handler: handleGild
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: TransferBatch(indexed address,indexed address,indexed
-            address,uint256[],uint256[])
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
-        - event: TransferSingle(indexed address,indexed address,indexed
-            address,uint256,uint256)
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleTransferSingle
         - event: URI(string,indexed uint256)
           handler: handleURI
-        - event: Ungild(address,uint256,uint256)
-          handler: handleUngild
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
       file: ./src/mapping.ts
   - kind: ethereum
-    name: ChainlinkTwoFeedPriceOracle
-    network: matic
+    name: TwoPriceOracle
+    network: rinkeby
     source:
-      abi: ChainlinkTwoFeedPriceOracle
-      address: "0x9b64bF291c526B01D82545DF544feAEdE410dC86"
-      startBlock: 27355829
+      abi: TwoPriceOracle
+      address: "0x0C36Ece6f4b265827aa91a0d71Ff37113aE4eC69"
+      startBlock: 10947486
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -63,11 +61,11 @@ dataSources:
         - ReferencePrice
         - Block
       abis:
-        - name: ChainlinkTwoFeedPriceOracle
-          file: ./abis/ChainlinkTwoFeedPriceOracle.json
+        - name: TwoPriceOracle
+          file: ./abis/TwoPriceOracle.json
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
       blockHandlers:
         - handler: handleBlock
-      file: ./src/chainlinkTwoFeedPriceOracle.ts
+      file: ./src/TwoPriceOracle.ts

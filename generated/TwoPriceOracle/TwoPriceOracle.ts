@@ -44,12 +44,9 @@ export class ConstructionConfigStruct extends ethereum.Tuple {
   }
 }
 
-export class ChainlinkTwoFeedPriceOracle extends ethereum.SmartContract {
-  static bind(address: Address): ChainlinkTwoFeedPriceOracle {
-    return new ChainlinkTwoFeedPriceOracle(
-      "ChainlinkTwoFeedPriceOracle",
-      address
-    );
+export class TwoPriceOracle extends ethereum.SmartContract {
+  static bind(address: Address): TwoPriceOracle {
+    return new TwoPriceOracle("TwoPriceOracle", address);
   }
 
   base(): Address {
