@@ -1,95 +1,104 @@
-[
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "base",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "quote",
-            "type": "address"
-          }
-        ],
-        "internalType": "struct ConstructionConfig",
-        "name": "config_",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "base",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "quote",
-            "type": "address"
-          }
-        ],
-        "indexed": false,
-        "internalType": "struct ConstructionConfig",
-        "name": "config",
-        "type": "tuple"
-      }
-    ],
-    "name": "Construction",
-    "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "base",
-    "outputs": [
-      {
-        "internalType": "contract IPriceOracle",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "price",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "price_",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "quote",
-    "outputs": [
-      {
-        "internalType": "contract IPriceOracle",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-]
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "TwoPriceOracle",
+  "sourceName": "contracts/oracle/price/TwoPriceOracle.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "base",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "quote",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct TwoPriceOracleConstructionConfig",
+          "name": "config_",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "base",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "quote",
+              "type": "address"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct TwoPriceOracleConstructionConfig",
+          "name": "config",
+          "type": "tuple"
+        }
+      ],
+      "name": "Construction",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "base",
+      "outputs": [
+        {
+          "internalType": "contract IPriceOracle",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "price",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price_",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "quote",
+      "outputs": [
+        {
+          "internalType": "contract IPriceOracle",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60c060405234801561001057600080fd5b506040516103eb3803806103eb83398101604081905261002f916100b4565b80516001600160a01b0390811660805260208083018051831660a05260408051338152855185169381019390935290519092168183015290517f3928767a7b1aefe738102e15a05eb56cc29c394f05627cd33764d8d42f389ff79181900360600190a15061011c565b80516001600160a01b03811681146100af57600080fd5b919050565b6000604082840312156100c657600080fd5b604080519081016001600160401b03811182821017156100f657634e487b7160e01b600052604160045260246000fd5b60405261010283610098565b815261011060208401610098565b60208201529392505050565b60805160a05161029f61014c60003960008181608f015260ce015260008181604b0152610150015261029f6000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c80635001f3b514610046578063999b93af1461008a578063a035b1fe146100b1575b600080fd5b61006d7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b61006d7f000000000000000000000000000000000000000000000000000000000000000081565b6100b96100c7565b604051908152602001610081565b60006101d67f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031663a035b1fe6040518163ffffffff1660e01b8152600401602060405180830381865afa15801561012a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061014e9190610201565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031663a035b1fe6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156101ac573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101d09190610201565b906101db565b905090565b6000816101f0670de0b6b3a76400008561021a565b6101fa9190610247565b9392505050565b60006020828403121561021357600080fd5b5051919050565b600081600019048311821515161561024257634e487b7160e01b600052601160045260246000fd5b500290565b60008261026457634e487b7160e01b600052601260045260246000fd5b50049056fea2646970667358221220251f588b9c3c380f9a31a2c1d7a36c505383440be3b8ea923be37b1d9809c2ee64736f6c634300080a0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c80635001f3b514610046578063999b93af1461008a578063a035b1fe146100b1575b600080fd5b61006d7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b61006d7f000000000000000000000000000000000000000000000000000000000000000081565b6100b96100c7565b604051908152602001610081565b60006101d67f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031663a035b1fe6040518163ffffffff1660e01b8152600401602060405180830381865afa15801561012a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061014e9190610201565b7f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031663a035b1fe6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156101ac573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101d09190610201565b906101db565b905090565b6000816101f0670de0b6b3a76400008561021a565b6101fa9190610247565b9392505050565b60006020828403121561021357600080fd5b5051919050565b600081600019048311821515161561024257634e487b7160e01b600052601160045260246000fd5b500290565b60008261026457634e487b7160e01b600052601260045260246000fd5b50049056fea2646970667358221220251f588b9c3c380f9a31a2c1d7a36c505383440be3b8ea923be37b1d9809c2ee64736f6c634300080a0033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

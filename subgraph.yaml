@@ -1,17 +1,62 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: Erc20PriceOracleVault
-    network: rinkeby
+  - kind: ethereum/contract
+    name: Erc20PriceOracleVaultFactory
+    network: localhost
     source:
-      abi: Erc20PriceOracleVault
-      address: "0xCFE71905427617A4c048420bFB3E6537A2ADF51b"
-      startBlock: 10947488
+      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"
+      abi: Erc20PriceOracleVaultFactory
+      startBlock: 17
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - VerifyFactory
+        - Verify
+      abis:
+        - name: Erc20PriceOracleVaultFactory
+          file: ./abis/Erc20PriceOracleVaultFactory.json
+      eventHandlers:
+        - event: NewChild(address,address)
+          handler: handleNewChild
+        - event: Implementation(address,address)
+          handler: handleImplementation
+      file: ./src/Erc20PriceOracleVaultFactory.ts
+  - kind: ethereum/contract
+    name: TwoPriceOracleFactory
+    network: localhost
+    source:
+      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE"
+      abi: TwoPriceOracleFactory
+      startBlock: 18
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - VerifyFactory
+        - Verify
+      abis:
+        - name: TwoPriceOracleFactory
+          file: ./abis/TwoPriceOracleFactory.json
+      eventHandlers:
+        - event: NewChild(address,address)
+          handler: handleNewChild
+        - event: Implementation(address,address)
+          handler: handleImplementation
+      file: ./src/TwoPriceOracleFactory.ts
+templates:
+  - kind: ethereum
+    name: Erc20PriceOracleVaultTemplate
+    network: localhost
+    source:
+      abi: Erc20PriceOracleVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Approval
@@ -45,17 +90,15 @@ dataSources:
           handler: handleURI
         - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleWithdraw
-      file: ./src/mapping.ts
+      file: ./src/Erc20PriceOracleVault.ts
   - kind: ethereum
-    name: TwoPriceOracle
-    network: rinkeby
+    name: TwoPriceOracleTemplate
+    network: localhost
     source:
       abi: TwoPriceOracle
-      address: "0x0C36Ece6f4b265827aa91a0d71Ff37113aE4eC69"
-      startBlock: 10947486
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ReferencePrice
@@ -66,6 +109,4 @@ dataSources:
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
-      blockHandlers:
-        - handler: handleBlock
       file: ./src/TwoPriceOracle.ts

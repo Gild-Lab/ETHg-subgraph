@@ -7,15 +7,12 @@ import {
 	erc20Contract,
 	ERC20Balance,
 	ERC20Approval,
-} from '../../generated/schema'
-
-import {
-	constants,
-} from '@amxx/graphprotocol-utils'
+} from '../../../generated/schema'
 
 import {
 	fetchAccount
 } from './account'
+import { ZERO_BD, ZERO_BI } from "../../utils"
 
 export function fetchERC20(address: Address): erc20Contract {
 	let account  = fetchAccount(address)
@@ -50,8 +47,8 @@ export function fetchERC20Balance(contract: erc20Contract, account: Account | nu
 		balance                 = new ERC20Balance(id)
 		balance.contract        = contract.id
 		balance.account         = account ? account.id : null
-		balance.value           = constants.BIGDECIMAL_ZERO
-		balance.valueExact      = constants.BIGINT_ZERO
+		balance.value           = ZERO_BD
+		balance.valueExact      = ZERO_BI
 		balance.save()
 	}
 
@@ -67,8 +64,8 @@ export function fetchERC20Approval(contract: erc20Contract, owner: Account, spen
 		approval.contract       = contract.id
 		approval.owner          = owner.id
 		approval.spender        = spender.id
-		approval.value          = constants.BIGDECIMAL_ZERO
-		approval.valueExact     = constants.BIGINT_ZERO
+		approval.value          = ZERO_BD
+		approval.valueExact     = ZERO_BI
 	}
 
 	return approval as ERC20Approval

@@ -9,7 +9,7 @@ import {
 	ERC1155Token,
 	ERC1155Balance,
 	ERC1155Operator,
-} from '../../generated/schema'
+} from '../../../generated/schema'
 
 import {
 	constants,
@@ -17,7 +17,7 @@ import {
 
 import {
 	fetchAccount,
-} from '../fetch/account'
+} from './account'
 
 export function fetchERC1155(address: Address): ERC1155Contract {
 	let account        = fetchAccount(address)

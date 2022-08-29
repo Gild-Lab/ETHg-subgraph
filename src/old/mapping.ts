@@ -10,9 +10,9 @@ import {
   TransferSingle,
   URI,
   Withdraw as WithdrawEvent
-} from "../generated/Erc20PriceOracleVault/Erc20PriceOracleVault"
+} from "../../generated/Erc20PriceOracleVault/Erc20PriceOracleVault"
 
-import { Deposit, Withdraw, Construction, Account, ERC20Transfer, ERC1155Contract, ERC1155Transfer } from "../generated/schema"
+import { Deposit, Withdraw, Construction, Account, ERC20Transfer, ERC1155Contract, ERC1155Transfer } from "../../generated/schema"
 import {
 	fetchERC20,
 	fetchERC20Approval,

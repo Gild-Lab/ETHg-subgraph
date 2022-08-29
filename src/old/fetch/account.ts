@@ -4,7 +4,7 @@ import {
 
 import {
 	Account,
-} from '../../generated/schema'
+} from '../../../generated/schema'
 
 export function fetchAccount(address: Address): Account {
 	let account = new Account(address.toHex())

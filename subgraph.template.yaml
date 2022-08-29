@@ -1,14 +1,14 @@
 specVersion: 0.0.4
 schema:
-  file: schema.graphql
+  file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Erc20PriceOracleVaultFactory
-    network: localhost
+    network: {{ network }}
     source:
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"
+      address: "{{ ERC20PriceOracleVaultFactory }}"
       abi: Erc20PriceOracleVaultFactory
-      startBlock: 17
+      startBlock: {{ ERC20PriceOracleVaultFactoryBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -18,20 +18,20 @@ dataSources:
         - Verify
       abis:
         - name: Erc20PriceOracleVaultFactory
-          file: Erc20PriceOracleVaultFactory/abis/Erc20PriceOracleVaultFactory.json
+          file: ./abis/Erc20PriceOracleVaultFactory.json
       eventHandlers:
         - event: NewChild(address,address)
           handler: handleNewChild
         - event: Implementation(address,address)
           handler: handleImplementation
-      file: Erc20PriceOracleVaultFactory/Erc20PriceOracleVaultFactory.wasm
+      file: ./src/Erc20PriceOracleVaultFactory.ts
   - kind: ethereum/contract
     name: TwoPriceOracleFactory
-    network: localhost
+    network: {{ network }}
     source:
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE"
+      address: "{{ TwoPriceOracleFactory }}"
       abi: TwoPriceOracleFactory
-      startBlock: 18
+      startBlock: {{ TwoPriceOracleFactoryBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -41,17 +41,17 @@ dataSources:
         - Verify
       abis:
         - name: TwoPriceOracleFactory
-          file: TwoPriceOracleFactory/abis/TwoPriceOracleFactory.json
+          file: ./abis/TwoPriceOracleFactory.json
       eventHandlers:
         - event: NewChild(address,address)
           handler: handleNewChild
         - event: Implementation(address,address)
           handler: handleImplementation
-      file: Erc20PriceOracleVaultFactory/Erc20PriceOracleVaultFactory.wasm
+      file: ./src/TwoPriceOracleFactory.ts
 templates:
   - kind: ethereum
     name: Erc20PriceOracleVaultTemplate
-    network: localhost
+    network: {{ network }}
     source:
       abi: Erc20PriceOracleVault
     mapping:
@@ -70,7 +70,7 @@ templates:
         - Withdraw
       abis:
         - name: Erc20PriceOracleVault
-          file: Erc20PriceOracleVaultTemplate/abis/Erc20PriceOracleVault.json
+          file: ./abis/Erc20PriceOracleVault.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
@@ -90,10 +90,10 @@ templates:
           handler: handleURI
         - event: Withdraw(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleWithdraw
-      file: Erc20PriceOracleVaultFactory/Erc20PriceOracleVaultFactory.wasm
+      file: ./src/Erc20PriceOracleVault.ts
   - kind: ethereum
     name: TwoPriceOracleTemplate
-    network: localhost
+    network: {{ network }}
     source:
       abi: TwoPriceOracle
     mapping:
@@ -105,8 +105,8 @@ templates:
         - Block
       abis:
         - name: TwoPriceOracle
-          file: TwoPriceOracleTemplate/abis/TwoPriceOracle.json
+          file: ./abis/TwoPriceOracle.json
       eventHandlers:
         - event: Construction(address,(address,address))
           handler: handleConstruction
-      file: Erc20PriceOracleVaultFactory/Erc20PriceOracleVaultFactory.wasm
+      file: ./src/TwoPriceOracle.ts
