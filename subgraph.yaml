@@ -6,9 +6,9 @@ dataSources:
     name: Erc20PriceOracleVaultFactory
     network: localhost
     source:
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       abi: Erc20PriceOracleVaultFactory
-      startBlock: 17
+      startBlock: 1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -29,9 +29,9 @@ dataSources:
     name: TwoPriceOracleFactory
     network: localhost
     source:
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE"
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
       abi: TwoPriceOracleFactory
-      startBlock: 18
+      startBlock: 2
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -47,6 +47,10 @@ dataSources:
           handler: handleNewChild
         - event: Implementation(address,address)
           handler: handleImplementation
+      # blockHandlers:
+      #   - handler: handleBlock
+      #     filter:
+      #       kind: call
       file: ./src/TwoPriceOracleFactory.ts
 templates:
   - kind: ethereum
@@ -76,7 +80,7 @@ templates:
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Construction(address,(address,string,string,string))
+        - event: ERC20PriceOracleVaultConstruction(address,(address,(address,string,string,string)))
           handler: handleConstruction
         - event: Deposit(indexed address,indexed address,uint256,uint256)
           handler: handleDeposit

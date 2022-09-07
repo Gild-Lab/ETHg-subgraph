@@ -7,7 +7,8 @@
     "build": "graph build",
     "hardhat-node": "npx hardhat node",
     "graph-node": "docker-compose -f \"docker/docker-compose.yml\" up",
-    "deploy-subgraph": "ts-node scripts/index.ts"
+    "deploy-subgraph": "ts-node scripts/index.ts",
+    "prepare": "npx mustache config/localhost.json subgraph.template.yaml subgraph.yaml"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

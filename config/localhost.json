@@ -1,7 +1,7 @@
 {
-  "ERC20PriceOracleVaultFactory": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
-  "ERC20PriceOracleVaultFactoryBlock": 17,
-  "TwoPriceOracleFactory": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
-  "TwoPriceOracleFactoryBlock": 18,
+  "ERC20PriceOracleVaultFactory": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "ERC20PriceOracleVaultFactoryBlock": 1,
+  "TwoPriceOracleFactory": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  "TwoPriceOracleFactoryBlock": 2,
   "network": "localhost"
 }

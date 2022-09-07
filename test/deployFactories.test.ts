@@ -8,7 +8,7 @@ import * as Util from "./utils/utils";
 
 export let erc20PriceOracleVaultFactory: ERC20PriceOracleVaultFactory;
 export let twoPriceOracleFactory: TwoPriceOracleFactory
-let subgraphName = "rain-protocol/offchainAssetVault";
+let subgraphName = "gild-lab/ethgild";
 export let subgraph: ApolloFetch;
 
 before("Deploy ERC20PriceOracleVaultFactory and TwoPriceOracleFactory", async () => {

@@ -6,4 +6,5 @@ docker
 generated
 typechain
 build
+contracts
 .env

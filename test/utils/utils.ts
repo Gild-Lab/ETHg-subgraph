@@ -29,7 +29,14 @@ import type {
   ImplementationEvent,
   NewChildEvent,
 } from "../../typechain/Factory";
-import { ERC20PriceOracleVault, TestChainlinkDataFeed, TestErc20, TwoPriceOracle } from "../../typechain";
+import {
+  ERC20PriceOracleVault,
+  TestChainlinkDataFeed,
+  TestErc20,
+  TwoPriceOracle,
+  TwoPriceOracleFactory,
+} from "../../typechain";
+import { TwoPriceOracleConstructionConfigStruct } from "../../typechain/TwoPriceOracleFactory";
 
 // Interfaces
 interface SyncedSubgraphType {
@@ -185,15 +192,12 @@ export const OrderBookOps = {
   COUNTERPARTY_FUNDS_CLEARED: 1 + AllStandardOps.length,
 };
 
-
 /**
  * Calculate the amount necessary to send or refund for get a `desiredLevel` from `currentLevel` on a TierContract
  * @param desiredLvl Desired TierLevel. Required to be between 0-8
  * @param currentLevel (Optional) Current TierLevel, by default if Tier.Zero -  Required to be between 0-8
  * @returns The difference of tokens between the actual level and desired level
- */;
-
-/**
+ */ /**
  * Create a fixed number with ethers. This intend to reduce the code and
  * manage the same format different to default one used by ethers
  * @param value value to convert to fixed number
@@ -515,15 +519,14 @@ export const xauDecimals = 8;
 export const quotePrice = "186051000000";
 export const basePrice = "167917253245";
 
-export const deployERC20PriceOracleVault = async (): Promise<
-  [
-    ERC20PriceOracleVault,
-    TestErc20,
-    TwoPriceOracle,
-    TestChainlinkDataFeed,
-    TestChainlinkDataFeed
-  ]
-> => {
+// 1 hour
+const baseStaleAfter = 60 * 60;
+// 48 hours
+const quoteStaleAfter = 48 * 60 * 60;
+
+export async function deployTwoPriceOracle(
+  factory: TwoPriceOracleFactory
+): Promise<ContractTransaction> {
   const oracleFactory = await ethers.getContractFactory(
     "TestChainlinkDataFeed"
   );
@@ -552,15 +555,6 @@ export const deployERC20PriceOracleVault = async (): Promise<
     answeredInRound: 1,
   });
 
-  // 1 hour
-  const baseStaleAfter = 60 * 60;
-  // 48 hours
-  const quoteStaleAfter = 48 * 60 * 60;
-
-  const testErc20 = await ethers.getContractFactory("TestErc20");
-  const testErc20Contract = (await testErc20.deploy()) as TestErc20;
-  await testErc20Contract.deployed();
-
   const chainlinkFeedPriceOracleFactory = await ethers.getContractFactory(
     "ChainlinkFeedPriceOracle"
   );
@@ -569,44 +563,18 @@ export const deployERC20PriceOracleVault = async (): Promise<
       feed: basePriceOracle.address,
       staleAfter: baseStaleAfter,
     });
+
   const chainlinkFeedPriceOracleQuote =
     await chainlinkFeedPriceOracleFactory.deploy({
       feed: quotePriceOracle.address,
       staleAfter: quoteStaleAfter,
     });
+
   await chainlinkFeedPriceOracleBase.deployed();
   await chainlinkFeedPriceOracleQuote.deployed();
-
-  const twoPriceOracleFactory = await ethers.getContractFactory(
-    "TwoPriceOracle"
-  );
-  const twoPriceOracle = (await twoPriceOracleFactory.deploy({
+  const config: TwoPriceOracleConstructionConfigStruct = {
     base: chainlinkFeedPriceOracleBase.address,
     quote: chainlinkFeedPriceOracleQuote.address,
-  })) as TwoPriceOracle;
-
-  const constructionConfig = {
-    asset: testErc20Contract.address,
-    name: "EthGild",
-    symbol: "ETHg",
-    uri: "ipfs://bafkreiahuttak2jvjzsd4r62xoxb4e2mhphb66o4cl2ntegnjridtyqnz4",
   };
-
-  const erc20PriceOracleVaultFactory = await ethers.getContractFactory(
-    "ERC20PriceOracleVault"
-  );
-
-  const erc20PriceOracleVault = (await erc20PriceOracleVaultFactory.deploy({
-    priceOracle: twoPriceOracle.address,
-    receiptVaultConfig: constructionConfig,
-  })) as ERC20PriceOracleVault;
-  await erc20PriceOracleVault.deployed();
-
-  return [
-    erc20PriceOracleVault,
-    testErc20Contract,
-    twoPriceOracle,
-    basePriceOracle,
-    quotePriceOracle,
-  ];
-};
+  return await factory.createChildTyped(config);
+}

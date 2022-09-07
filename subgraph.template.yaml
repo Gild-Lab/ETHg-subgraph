@@ -47,6 +47,10 @@ dataSources:
           handler: handleNewChild
         - event: Implementation(address,address)
           handler: handleImplementation
+      # blockHandlers:
+      #   - handler: handleBlock
+      #     filter:
+      #       kind: call
       file: ./src/TwoPriceOracleFactory.ts
 templates:
   - kind: ethereum
@@ -76,7 +80,7 @@ templates:
           handler: handleApproval
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
-        - event: Construction(address,(address,string,string,string))
+        - event: ERC20PriceOracleVaultConstruction(address,(address,(address,string,string,string)))
           handler: handleConstruction
         - event: Deposit(indexed address,indexed address,uint256,uint256)
           handler: handleDeposit
